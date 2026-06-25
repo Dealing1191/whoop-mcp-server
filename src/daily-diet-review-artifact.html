@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Diet Review</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #222636;
+      --border: #2e3348;
+      --accent: #4f8ef7;
+      --accent2: #7c5cf4;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      padding: 24px 16px 48px;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .header-left h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header-left .subtitle { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+    .date-badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: right;
+    }
+    .date-badge strong { display: block; color: var(--text); font-size: 1rem; }
+
+    /* ── Grid ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    @media (max-width: 700px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+    .card-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-title .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+    .card-title .dot.green { background: var(--green); }
+    .card-title .dot.yellow { background: var(--yellow); }
+    .card-title .dot.purple { background: var(--accent2); }
+    .card-title .dot.red { background: var(--red); }
+
+    /* ── WHOOP Metrics ── */
+    .metric-stat { text-align: center; padding: 12px 8px; }
+    .metric-stat .val {
+      font-size: 1.9rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .metric-stat .unit { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+    .metric-stat .label { font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
+    .text-green { color: var(--green); }
+    .text-yellow { color: var(--yellow); }
+    .text-accent { color: var(--accent); }
+    .text-purple { color: var(--accent2); }
+    .text-red { color: var(--red); }
+
+    /* ── Recovery Ring ── */
+    .recovery-wrap {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .ring-svg { flex-shrink: 0; }
+    .ring-info .score {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--green);
+      line-height: 1;
+    }
+    .ring-info .label { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+    .ring-info .status {
+      display: inline-block;
+      background: rgba(34,197,94,.15);
+      color: var(--green);
+      border-radius: 6px;
+      padding: 2px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .hrv-rhr {
+      margin-top: 14px;
+      display: flex;
+      gap: 14px;
+    }
+    .hrv-rhr .mini { flex: 1; }
+    .hrv-rhr .mini .mv { font-size: 1.1rem; font-weight: 700; }
+    .hrv-rhr .mini .ml { font-size: 0.7rem; color: var(--muted); }
+
+    /* ── Calorie bar ── */
+    .cal-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+    .cal-bar-bg {
+      flex: 1;
+      height: 10px;
+      background: var(--surface2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .cal-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 1s ease;
+    }
+    .cal-num { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+
+    /* ── Hydration tracker ── */
+    .water-glasses {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .glass {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      border: 2px solid var(--border);
+      background: var(--surface2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .glass::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 0%;
+      background: rgba(79,142,247,0.3);
+      transition: height 0.3s ease;
+    }
+    .glass.filled { border-color: var(--accent); }
+    .glass.filled::before { height: 100%; }
+    .glass:hover { transform: scale(1.1); }
+    .water-target { font-size: 0.72rem; color: var(--muted); margin-top: 8px; }
+    .water-count { font-size: 0.9rem; color: var(--accent); font-weight: 600; }
+
+    /* ── Meal checklist ── */
+    .meal-section { margin-bottom: 14px; }
+    .meal-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .meal-label .time-chip {
+      background: var(--surface2);
+      border-radius: 5px;
+      padding: 1px 7px;
+      font-size: 0.68rem;
+      color: var(--accent);
+    }
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-bottom: 4px;
+    }
+    .check-item:hover { background: var(--surface2); }
+    .check-item input[type="checkbox"] { margin-top: 2px; accent-color: var(--green); width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
+    .check-item label { font-size: 0.82rem; cursor: pointer; line-height: 1.4; }
+    .check-item label.done { text-decoration: line-through; color: var(--muted); }
+
+    /* ── Condition pills ── */
+    .condition-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .pill {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+    .pill.alert { background: rgba(239,68,68,.12); color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
+    .pill.warn { background: rgba(245,158,11,.1); color: #fcd34d; border: 1px solid rgba(245,158,11,.25); }
+    .pill.info { background: rgba(79,142,247,.1); color: #93c5fd; border: 1px solid rgba(79,142,247,.25); }
+
+    /* ── Diet rules ── */
+    .rule-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .rule-row:last-child { border-bottom: none; }
+    .rule-icon { font-size: 1rem; flex-shrink: 0; width: 22px; text-align: center; margin-top: 1px; }
+    .rule-body .rule-title { font-size: 0.82rem; font-weight: 600; }
+    .rule-body .rule-detail { font-size: 0.75rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+    /* ── Progress section ── */
+    .prog-row { margin-bottom: 12px; }
+    .prog-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .prog-name { font-size: 0.78rem; }
+    .prog-val { font-size: 0.78rem; color: var(--muted); }
+    .prog-bar {
+      height: 7px;
+      background: var(--surface2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .prog-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--green);
+    }
+    .prog-fill.warn { background: var(--yellow); }
+    .prog-fill.blue { background: var(--accent); }
+    .prog-fill.purple { background: var(--accent2); }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 4px; margin-bottom: 14px; background: var(--surface2); border-radius: 9px; padding: 4px; }
+    .tab { flex: 1; padding: 7px; border-radius: 7px; font-size: 0.75rem; font-weight: 500; text-align: center; cursor: pointer; color: var(--muted); transition: all 0.2s; border: none; background: transparent; }
+    .tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Foods avoid/include ── */
+    .food-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .food-col h4 { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+    .food-col.green h4 { color: var(--green); }
+    .food-col.red h4 { color: var(--red); }
+    .food-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--surface2);
+      border-radius: 7px;
+      padding: 5px 9px;
+      font-size: 0.75rem;
+      margin: 3px 2px;
+    }
+
+    /* ── Med timing ── */
+    .med-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: var(--surface2);
+      border-radius: 9px;
+      margin-bottom: 8px;
+    }
+    .med-time { font-size: 0.75rem; color: var(--accent); font-weight: 600; width: 60px; flex-shrink: 0; }
+    .med-name { font-size: 0.82rem; font-weight: 500; }
+    .med-note { font-size: 0.72rem; color: var(--muted); }
+    .med-check input { accent-color: var(--green); }
+    .med-check { margin-left: auto; }
+
+    /* ── Section spacing ── */
+    .section { margin-bottom: 20px; }
+
+    /* ── Insight box ── */
+    .insight {
+      background: linear-gradient(135deg, rgba(79,142,247,.08), rgba(124,92,244,.08));
+      border: 1px solid rgba(79,142,247,.25);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+    .insight .insight-title { font-weight: 600; color: var(--accent); margin-bottom: 6px; font-size: 0.85rem; }
+
+    /* ── Scrollable ── */
+    .scroll-x { overflow-x: auto; }
+
+    /* ── Animate in ── */
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    .card { animation: fadeUp .35s ease both; }
+    .card:nth-child(1) { animation-delay: .05s; }
+    .card:nth-child(2) { animation-delay: .1s; }
+    .card:nth-child(3) { animation-delay: .15s; }
+    .card:nth-child(4) { animation-delay: .2s; }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="header">
+  <div class="header-left">
+    <h1>🥗 Daily Diet Review</h1>
+    <div class="subtitle">Personalized nutrition · Raghav Chadha</div>
+  </div>
+  <div class="date-badge">
+    <strong id="today-date"></strong>
+    <span id="today-time"></span>
+  </div>
+</div>
+
+<!-- ── WHOOP Recovery Row ── -->
+<div class="section">
+  <div class="grid-2" style="margin-bottom:16px;">
+    <!-- Recovery card -->
+    <div class="card">
+      <div class="card-title"><span class="dot green"></span>WHOOP Recovery</div>
+      <div class="recovery-wrap">
+        <svg class="ring-svg" width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="32" fill="none" stroke="#2e3348" stroke-width="8"/>
+          <circle cx="40" cy="40" r="32" fill="none" stroke="#22c55e" stroke-width="8"
+            stroke-dasharray="201.06" stroke-dashoffset="12.06"
+            stroke-linecap="round" transform="rotate(-90 40 40)"/>
+          <text x="40" y="45" text-anchor="middle" fill="#22c55e" font-size="15" font-weight="800">94%</text>
+        </svg>
+        <div class="ring-info">
+          <div class="score">94%</div>
+          <div class="label">Recovery Score</div>
+          <div class="status">Well Recovered</div>
+          <div class="hrv-rhr">
+            <div class="mini">
+              <div class="mv text-green">98 ms</div>
+              <div class="ml">HRV</div>
+            </div>
+            <div class="mini">
+              <div class="mv text-accent">44 bpm</div>
+              <div class="ml">Resting HR</div>
+            </div>
+            <div class="mini">
+              <div class="mv" style="color:#a78bfa">96.7%</div>
+              <div class="ml">SpO₂</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today strain + calories -->
+    <div class="card">
+      <div class="card-title"><span class="dot yellow"></span>Today's Energy</div>
+      <div class="grid-2" style="gap:8px; margin-bottom:14px;">
+        <div class="metric-stat">
+          <div class="val text-yellow">2.6</div>
+          <div class="unit">/ 21 max</div>
+          <div class="label">Day Strain</div>
+        </div>
+        <div class="metric-stat">
+          <div class="val text-accent">744</div>
+          <div class="unit">kcal</div>
+          <div class="label">Calories Burned</div>
+        </div>
+      </div>
+
+      <div style="font-size:.75rem; color:var(--muted); margin-bottom:5px;">Calorie target progress (goal: 2,200 kcal)</div>
+      <div class="cal-row">
+        <div class="cal-bar-bg"><div class="cal-bar-fill" style="width:34%"></div></div>
+        <div class="cal-num">744 / 2,200</div>
+      </div>
+      <div style="margin-top:10px; font-size:.72rem; color:var(--muted);">
+        Light strain today → prioritise nutrient density over calories. Adjust if workouts added later.
+      </div>
+    </div>
+  </div>
+
+  <!-- 4-metric row -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Sleep from Last Night</div>
+    <div class="grid-4">
+      <div class="metric-stat">
+        <div class="val text-accent">6h 16m</div>
+        <div class="label">Total Sleep</div>
+      </div>
+      <div class="metric-stat">
+        <div class="val text-yellow">80%</div>
+        <div class="label">Performance</div>
+      </div>
+      <div class="metric-stat">
+        <div class="val text-green">1h 27m</div>
+        <div class="label">REM</div>
+      </div>
+      <div class="metric-stat">
+        <div class="val text-green">1h 5m</div>
+        <div class="label">Deep Sleep</div>
+      </div>
+    </div>
+    <div class="insight" style="margin-top:14px;">
+      <div class="insight-title">💡 Sleep & Nutrition Insight</div>
+      Sleep was slightly short (target 7–9 h). Short sleep elevates ghrelin (hunger hormone) and cortisol.
+      Focus on protein-rich breakfast and whole foods to stabilise appetite today. Avoid refined carbs that spike blood sugar.
+    </div>
+  </div>
+</div>
+
+<!-- ── Conditions + Dietary Rules ── -->
+<div class="section">
+  <div class="grid-2">
+    <!-- Active conditions -->
+    <div class="card">
+      <div class="card-title"><span class="dot red"></span>Active Conditions Affecting Diet</div>
+      <div class="condition-pills">
+        <span class="pill alert">Panhypopituitarism</span>
+        <span class="pill alert">Craniopharyngioma</span>
+        <span class="pill warn">NAFLD</span>
+        <span class="pill warn">Diabetes Mellitus</span>
+        <span class="pill warn">Hypothyroidism</span>
+        <span class="pill warn">High Cholesterol</span>
+        <span class="pill info">Adrenal Insufficiency</span>
+        <span class="pill info">Diabetes Insipidus</span>
+        <span class="pill info">Hypogonadism</span>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div class="rule-row">
+          <div class="rule-icon">🫀</div>
+          <div class="rule-body">
+            <div class="rule-title">NAFLD + High Cholesterol</div>
+            <div class="rule-detail">Avoid added sugar, trans fat, fried foods. Prioritise omega-3s (salmon, walnuts), soluble fibre (oats, beans), and olive oil.</div>
+          </div>
+        </div>
+        <div class="rule-row">
+          <div class="rule-icon">🩸</div>
+          <div class="rule-body">
+            <div class="rule-title">Diabetes Mellitus</div>
+            <div class="rule-detail">Low glycaemic index foods. Pair carbs with protein/fat. Consistent meal timing to avoid glucose spikes. Avoid sugary drinks.</div>
+          </div>
+        </div>
+        <div class="rule-row">
+          <div class="rule-icon">🦋</div>
+          <div class="rule-body">
+            <div class="rule-title">Hypothyroidism (Secondary)</div>
+            <div class="rule-detail">Take thyroid meds 30–60 min before eating. Limit raw cruciferous veg in excess. Ensure adequate selenium (Brazil nuts, eggs) and iodine.</div>
+          </div>
+        </div>
+        <div class="rule-row">
+          <div class="rule-icon">🧂</div>
+          <div class="rule-body">
+            <div class="rule-title">Adrenal Insufficiency</div>
+            <div class="rule-detail">Don't skip meals — risk of adrenal crisis. Slightly higher sodium needs. Take hydrocortisone with or just after food to avoid nausea.</div>
+          </div>
+        </div>
+        <div class="rule-row">
+          <div class="rule-icon">💧</div>
+          <div class="rule-body">
+            <div class="rule-title">Diabetes Insipidus</div>
+            <div class="rule-detail">Critical: monitor fluid intake/output. Avoid excessive water (risk of hyponatremia on DDAVP). Limit high-sodium processed foods.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Foods to eat / avoid -->
+    <div class="card">
+      <div class="card-title"><span class="dot purple"></span>Personalised Food Guide</div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(this,'eat')">✅ Prioritise</button>
+        <button class="tab" onclick="switchTab(this,'avoid')">🚫 Avoid</button>
+        <button class="tab" onclick="switchTab(this,'macros')">📊 Macros</button>
+      </div>
+
+      <div id="tab-eat" class="tab-panel active">
+        <div class="food-cols">
+          <div class="food-col green">
+            <h4>🟢 Include Daily</h4>
+            <div><span class="food-tag">🐟 Salmon / sardines</span><span class="food-tag">🥑 Avocado</span><span class="food-tag">🫐 Blueberries</span><span class="food-tag">🥚 Eggs</span><span class="food-tag">🥦 Cooked broccoli</span><span class="food-tag">🍠 Sweet potato</span><span class="food-tag">🥣 Rolled oats</span><span class="food-tag">🫘 Lentils / beans</span><span class="food-tag">🥜 Walnuts</span><span class="food-tag">🫒 Olive oil</span><span class="food-tag">🧄 Garlic</span><span class="food-tag">🌿 Brazil nuts (selenium)</span></div>
+          </div>
+          <div class="food-col red">
+            <h4>🔴 Limit or Avoid</h4>
+            <div><span class="food-tag">🍬 Added sugar</span><span class="food-tag">🍟 Fried foods</span><span class="food-tag">🥤 Sugary drinks</span><span class="food-tag">🍞 White bread</span><span class="food-tag">🍺 Alcohol</span><span class="food-tag">🥩 Processed meats</span><span class="food-tag">🧈 Trans fats</span><span class="food-tag">🥛 Excess dairy fat</span><span class="food-tag">🧂 High-sodium snacks</span><span class="food-tag">🥬 Excessive raw kale (thyroid)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-avoid" class="tab-panel">
+        <div class="rule-row">
+          <div class="rule-icon">⚠️</div>
+          <div class="rule-body">
+            <div class="rule-title">Alcohol</div>
+            <div class="rule-detail">Worsens NAFLD, interferes with adrenal meds, disrupts sleep. Avoid entirely.</div>
+          </div>
+        </div>
+        <div class="rule-row">
+          <div class="rule-icon">⚠️</div>
+          <div class="rule-body">
+            <div class="rule-title">Ultra-processed foods</div>
+            <div class="rule-detail">Spike blood sugar, worsen liver fat, raise cholesterol. Replace with whole-food alternatives.</div>
+          </div>
+        </div>
+        <div class="rule-row">
+          <div class="rule-icon">⚠️</div>
+          <div class="rule-body">
+            <div class="rule-title">Grapefruit / grapefruit juice</div>
+            <div class="rule-detail">Interacts with many medications. Avoid unless cleared by prescriber.</div>
+          </div>
+        </div>
+        <div class="rule-row">
+          <div class="rule-icon">⚠️</div>
+          <div class="rule-body">
+            <div class="rule-title">Skipping meals</div>
+            <div class="rule-detail">With adrenal insufficiency, meal skipping can precipitate a crisis. Eat on schedule.</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-macros" class="tab-panel">
+        <div class="prog-row">
+          <div class="prog-header"><span class="prog-name">Protein</span><span class="prog-val">Target: 130–150 g/day</span></div>
+          <div class="prog-bar"><div class="prog-fill blue" style="width:0%" id="protein-bar"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-header"><span class="prog-name">Fibre</span><span class="prog-val">Target: 30–35 g/day</span></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:0%" id="fibre-bar"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-header"><span class="prog-name">Healthy Fats (mono/poly)</span><span class="prog-val">Target: 60–70 g/day</span></div>
+          <div class="prog-bar"><div class="prog-fill purple" style="width:0%" id="fat-bar"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-header"><span class="prog-name">Net Carbs (low-GI)</span><span class="prog-val">Target: &lt;150 g/day</span></div>
+          <div class="prog-bar"><div class="prog-fill warn" style="width:0%" id="carb-bar"></div></div>
+        </div>
+        <div style="margin-top:12px;">
+          <div style="font-size:.75rem; color:var(--muted); margin-bottom:8px;">Log today's estimated intake:</div>
+          <div class="grid-2" style="gap:8px;">
+            <div><label style="font-size:.72rem;color:var(--muted);">Protein (g)</label><input type="number" id="in-protein" placeholder="0" min="0" max="300" oninput="updateMacros()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:6px 10px;font-size:.85rem;margin-top:3px;"></div>
+            <div><label style="font-size:.72rem;color:var(--muted);">Fibre (g)</label><input type="number" id="in-fibre" placeholder="0" min="0" max="100" oninput="updateMacros()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:6px 10px;font-size:.85rem;margin-top:3px;"></div>
+            <div><label style="font-size:.72rem;color:var(--muted);">Healthy Fats (g)</label><input type="number" id="in-fat" placeholder="0" min="0" max="200" oninput="updateMacros()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:6px 10px;font-size:.85rem;margin-top:3px;"></div>
+            <div><label style="font-size:.72rem;color:var(--muted);">Net Carbs (g)</label><input type="number" id="in-carbs" placeholder="0" min="0" max="400" oninput="updateMacros()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:6px 10px;font-size:.85rem;margin-top:3px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Meals + Meds + Hydration ── -->
+<div class="section">
+  <div class="grid-3">
+    <!-- Meal Checklist -->
+    <div class="card">
+      <div class="card-title"><span class="dot green"></span>Meal Checklist</div>
+
+      <div class="meal-section">
+        <div class="meal-label">☀️ Breakfast <span class="time-chip">7–8 AM</span></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Eggs + avocado on whole-grain toast</label></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Greek yoghurt with blueberries &amp; walnuts</label></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Oatmeal with chia seeds (no added sugar)</label></div>
+      </div>
+
+      <div class="meal-section">
+        <div class="meal-label">🌤️ Mid-Morning <span class="time-chip">10–11 AM</span></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Brazil nuts (2–3, selenium source)</label></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Apple or pear (low GI)</label></div>
+      </div>
+
+      <div class="meal-section">
+        <div class="meal-label">🌞 Lunch <span class="time-chip">12–1 PM</span></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Salmon or sardines with lentil salad</label></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Olive oil + lemon dressing</label></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Large serving of leafy greens</label></div>
+      </div>
+
+      <div class="meal-section">
+        <div class="meal-label">🌅 Dinner <span class="time-chip">6–7 PM</span></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Lean protein (chicken, turkey, tofu)</label></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Roasted vegetables (broccoli, sweet potato)</label></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>No refined carbs after 6 PM</label></div>
+      </div>
+    </div>
+
+    <!-- Medication Timing -->
+    <div class="card">
+      <div class="card-title"><span class="dot purple"></span>Medication & Food Timing</div>
+
+      <div class="med-row">
+        <div class="med-time">6:00 AM</div>
+        <div>
+          <div class="med-name">DDAVP (Desmopressin)</div>
+          <div class="med-note">Take on empty stomach. Monitor thirst / urine output.</div>
+        </div>
+        <div class="med-check"><input type="checkbox" title="Taken"></div>
+      </div>
+
+      <div class="med-row">
+        <div class="med-time">6:30 AM</div>
+        <div>
+          <div class="med-name">Levothyroxine (Thyroid)</div>
+          <div class="med-note">30–60 min before breakfast. No calcium/iron within 4 h.</div>
+        </div>
+        <div class="med-check"><input type="checkbox" title="Taken"></div>
+      </div>
+
+      <div class="med-row">
+        <div class="med-time">7:00 AM</div>
+        <div>
+          <div class="med-name">Hydrocortisone (Morning dose)</div>
+          <div class="med-note">Take with or just after breakfast to reduce nausea.</div>
+        </div>
+        <div class="med-check"><input type="checkbox" title="Taken"></div>
+      </div>
+
+      <div class="med-row">
+        <div class="med-time">12:00 PM</div>
+        <div>
+          <div class="med-name">Hydrocortisone (Midday dose)</div>
+          <div class="med-note">Take with lunch. Do not take late — disrupts cortisol rhythm.</div>
+        </div>
+        <div class="med-check"><input type="checkbox" title="Taken"></div>
+      </div>
+
+      <div class="med-row">
+        <div class="med-time">Evening</div>
+        <div>
+          <div class="med-name">Testosterone / other hormones</div>
+          <div class="med-note">Per prescriber schedule. Take with food if GI upset.</div>
+        </div>
+        <div class="med-check"><input type="checkbox" title="Taken"></div>
+      </div>
+
+      <div class="insight" style="margin-top:14px;">
+        <div class="insight-title">⚠️ Adrenal Sick-Day Rule</div>
+        If unwell, vomiting, or high stress today: double hydrocortisone dose and contact your endocrinologist immediately.
+      </div>
+    </div>
+
+    <!-- Hydration -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Hydration Tracker</div>
+
+      <div style="font-size:.78rem; color:var(--muted); margin-bottom:10px; line-height:1.5;">
+        <strong style="color:var(--text);">Diabetes insipidus note:</strong> Don't over-hydrate on DDAVP — risk of hyponatraemia. Drink to thirst only. Target <strong style="color:var(--accent);">~8 cups</strong> unless your endocrinologist advises otherwise.
+      </div>
+
+      <div class="water-glasses" id="glasses"></div>
+      <div class="water-target" id="water-label">Tap a glass to log</div>
+
+      <div style="margin-top:16px;">
+        <div style="font-size:.72rem; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:.05em; font-weight:600;">Today's fluid log</div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Morning glass with meds ✓</label></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Herbal tea (no calcium supplements within 4 h of Levothyroxine)</label></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>No sugary drinks all day</label></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Urine colour pale yellow (good hydration sign)</label></div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div style="font-size:.72rem; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.05em; font-weight:600;">Supplements to consider</div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Vitamin D (low sun exposure / panhypopituitarism)</label></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Omega-3 fish oil (NAFLD + cholesterol)</label></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Magnesium glycinate (sleep quality, muscle)</label></div>
+        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>CoQ10 (if on statins)</label></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Daily Summary ── -->
+<div class="section">
+  <div class="card">
+    <div class="card-title"><span class="dot green"></span>Today's Diet Score</div>
+    <div id="score-display" style="text-align:center; padding: 10px 0 4px;">
+      <div style="font-size:3rem; font-weight:800; color:var(--green);" id="score-num">—</div>
+      <div style="font-size:.85rem; color:var(--muted);">Check items above to calculate score</div>
+    </div>
+    <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;" id="score-badges"></div>
+  </div>
+</div>
+
+<script>
+  // ── Date/time ──
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('today-date').textContent = now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+    document.getElementById('today-time').textContent = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // ── Checkbox toggle ──
+  function toggle(row) {
+    const cb = row.querySelector('input[type="checkbox"]');
+    const lbl = row.querySelector('label');
+    if (event.target !== cb) cb.checked = !cb.checked;
+    if (cb.checked) lbl.classList.add('done');
+    else lbl.classList.remove('done');
+    updateScore();
+  }
+
+  // ── Tabs ──
+  function switchTab(btn, id) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + id).classList.add('active');
+  }
+
+  // ── Water glasses ──
+  const GLASSES = 8;
+  let filled = 0;
+  const container = document.getElementById('glasses');
+  for (let i = 0; i < GLASSES; i++) {
+    const g = document.createElement('div');
+    g.className = 'glass';
+    g.title = 'Glass ' + (i+1);
+    g.textContent = '🥛';
+    g.dataset.idx = i;
+    g.addEventListener('click', () => {
+      const idx = parseInt(g.dataset.idx);
+      const glasses = document.querySelectorAll('.glass');
+      filled = idx + 1;
+      glasses.forEach((gl, j) => {
+        if (j < filled) gl.classList.add('filled');
+        else gl.classList.remove('filled');
+      });
+      document.getElementById('water-label').innerHTML =
+        `<span class="water-count">${filled} / ${GLASSES} cups</span> logged today`;
+      updateScore();
+    });
+    container.appendChild(g);
+  }
+
+  // ── Macros ──
+  function updateMacros() {
+    const targets = { protein: 150, fibre: 35, fat: 70, carbs: 150 };
+    const vals = {
+      protein: +document.getElementById('in-protein').value || 0,
+      fibre:   +document.getElementById('in-fibre').value   || 0,
+      fat:     +document.getElementById('in-fat').value     || 0,
+      carbs:   +document.getElementById('in-carbs').value   || 0,
+    };
+    for (const [k, t] of Object.entries(targets)) {
+      const pct = Math.min(100, Math.round(vals[k] / t * 100));
+      const bar = document.getElementById(k + '-bar') || document.getElementById(k === 'fat' ? 'fat-bar' : k + '-bar');
+      if (bar) bar.style.width = pct + '%';
+    }
+    updateScore();
+  }
+
+  // ── Score ──
+  function updateScore() {
+    const checks = document.querySelectorAll('.check-item input[type="checkbox"]');
+    const medChecks = document.querySelectorAll('.med-check input[type="checkbox"]');
+    const total = checks.length + medChecks.length;
+    let done = 0;
+    checks.forEach(c => { if (c.checked) done++; });
+    medChecks.forEach(c => { if (c.checked) done++; });
+    const hydration = filled >= 6 ? 1 : 0;
+    const overall = Math.round(((done + hydration) / (total + 1)) * 100);
+    const el = document.getElementById('score-num');
+    el.textContent = overall + '%';
+    el.style.color = overall >= 80 ? 'var(--green)' : overall >= 50 ? 'var(--yellow)' : 'var(--red)';
+    const badges = document.getElementById('score-badges');
+    badges.innerHTML = '';
+    if (filled >= 6) addBadge(badges, '💧 Hydration OK', 'info');
+    if (done >= Math.round(checks.length * 0.8)) addBadge(badges, '🥗 Diet on Track', 'info');
+    if (medChecks[0]?.checked && medChecks[1]?.checked) addBadge(badges, '💊 Meds Logged', 'info');
+  }
+
+  function addBadge(parent, text, type) {
+    const s = document.createElement('span');
+    s.className = 'pill ' + type;
+    s.textContent = text;
+    parent.appendChild(s);
+  }
+</script>
+</body>
+</html>
