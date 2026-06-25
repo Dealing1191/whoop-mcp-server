@@ -1,824 +1,496 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daily Diet Review</title>
-  <style>
-    :root {
-      --bg: #0f1117;
-      --surface: #1a1d27;
-      --surface2: #222636;
-      --border: #2e3348;
-      --accent: #4f8ef7;
-      --accent2: #7c5cf4;
-      --green: #22c55e;
-      --yellow: #f59e0b;
-      --red: #ef4444;
-      --text: #e2e8f0;
-      --muted: #64748b;
-      --radius: 12px;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      min-height: 100vh;
-      padding: 24px 16px 48px;
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Daily Health Coaching Briefing — June 24, 2026</title>
+<style>
+:root{
+  --bg:#0e1117;--surface:#161b27;--card:#1c2333;--border:#2a3347;
+  --green:#22c55e;--green-dim:rgba(34,197,94,.12);
+  --amber:#f59e0b;--amber-dim:rgba(245,158,11,.1);
+  --red:#ef4444;--red-dim:rgba(239,68,68,.1);
+  --blue:#4f8ef7;--blue-dim:rgba(79,142,247,.1);
+  --purple:#7c5cf4;
+  --text:#e2e8f0;--muted:#64748b;--subtle:#94a3b8;
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;}
 
-    /* ── Header ── */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .header-left h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .header-left .subtitle { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
-    .date-badge {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 14px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      text-align: right;
-    }
-    .date-badge strong { display: block; color: var(--text); font-size: 1rem; }
+/* ── Header bar ── */
+.hdr{background:linear-gradient(135deg,#1a2540 0%,#111827 100%);border-bottom:1px solid var(--border);padding:20px 28px 18px;}
+.hdr-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;}
+.hdr h1{font-size:1.25rem;font-weight:700;letter-spacing:-.01em;}
+.hdr h1 span{background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hdr .meta{font-size:.78rem;color:var(--muted);margin-top:4px;}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.badge{padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:600;letter-spacing:.02em;}
+.badge.green{background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,.25);}
+.badge.amber{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,158,11,.25);}
+.badge.blue{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(79,142,247,.25);}
 
-    /* ── Grid ── */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    @media (max-width: 700px) {
-      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
-    }
-    @media (max-width: 480px) {
-      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-    }
+/* ── Layout ── */
+.wrap{max-width:960px;margin:0 auto;padding:22px 18px 60px;}
+.section{margin-bottom:22px;}
+.section-title{font-size:.68rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
 
-    /* ── Card ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-    }
-    .card-title {
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .card-title .dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      flex-shrink: 0;
-    }
-    .card-title .dot.green { background: var(--green); }
-    .card-title .dot.yellow { background: var(--yellow); }
-    .card-title .dot.purple { background: var(--accent2); }
-    .card-title .dot.red { background: var(--red); }
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;}
+.card+.card{margin-top:12px;}
+.card-title{font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.card-title .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dot-green{background:var(--green);}
+.dot-amber{background:var(--amber);}
+.dot-red{background:var(--red);}
+.dot-blue{background:var(--blue);}
 
-    /* ── WHOOP Metrics ── */
-    .metric-stat { text-align: center; padding: 12px 8px; }
-    .metric-stat .val {
-      font-size: 1.9rem;
-      font-weight: 700;
-      line-height: 1;
-    }
-    .metric-stat .unit { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
-    .metric-stat .label { font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
-    .text-green { color: var(--green); }
-    .text-yellow { color: var(--yellow); }
-    .text-accent { color: var(--accent); }
-    .text-purple { color: var(--accent2); }
-    .text-red { color: var(--red); }
+/* ── Grid ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:680px){.g2,.g3,.g4{grid-template-columns:1fr 1fr;}}
+@media(max-width:420px){.g2,.g3,.g4{grid-template-columns:1fr;}}
 
-    /* ── Recovery Ring ── */
-    .recovery-wrap {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .ring-svg { flex-shrink: 0; }
-    .ring-info .score {
-      font-size: 2.4rem;
-      font-weight: 800;
-      color: var(--green);
-      line-height: 1;
-    }
-    .ring-info .label { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
-    .ring-info .status {
-      display: inline-block;
-      background: rgba(34,197,94,.15);
-      color: var(--green);
-      border-radius: 6px;
-      padding: 2px 10px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-top: 8px;
-    }
-    .hrv-rhr {
-      margin-top: 14px;
-      display: flex;
-      gap: 14px;
-    }
-    .hrv-rhr .mini { flex: 1; }
-    .hrv-rhr .mini .mv { font-size: 1.1rem; font-weight: 700; }
-    .hrv-rhr .mini .ml { font-size: 0.7rem; color: var(--muted); }
+/* ── Stat cells ── */
+.stat{padding:12px 10px;text-align:center;}
+.stat .v{font-size:1.7rem;font-weight:800;line-height:1;}
+.stat .u{font-size:.68rem;color:var(--muted);margin-top:2px;}
+.stat .l{font-size:.7rem;color:var(--subtle);margin-top:5px;}
+.green{color:var(--green);}
+.amber{color:var(--amber);}
+.red{color:var(--red);}
+.blue{color:var(--blue);}
+.purple{color:var(--purple);}
 
-    /* ── Calorie bar ── */
-    .cal-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-    .cal-bar-bg {
-      flex: 1;
-      height: 10px;
-      background: var(--surface2);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-    .cal-bar-fill {
-      height: 100%;
-      border-radius: 99px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      transition: width 1s ease;
-    }
-    .cal-num { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+/* ── Metrics table ── */
+.tbl{width:100%;border-collapse:collapse;font-size:.82rem;}
+.tbl th{text-align:left;padding:7px 10px;font-size:.68rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
+.tbl td{padding:8px 10px;border-bottom:1px solid rgba(42,51,71,.5);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl td:not(:first-child){text-align:right;}
+.tbl .row-hl td{background:rgba(79,142,247,.05);}
+.chip{display:inline-block;padding:2px 8px;border-radius:5px;font-size:.68rem;font-weight:600;}
+.chip.g{background:var(--green-dim);color:var(--green);}
+.chip.a{background:var(--amber-dim);color:var(--amber);}
+.chip.r{background:var(--red-dim);color:var(--red);}
 
-    /* ── Hydration tracker ── */
-    .water-glasses {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .glass {
-      width: 36px; height: 36px;
-      border-radius: 8px;
-      border: 2px solid var(--border);
-      background: var(--surface2);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      transition: all 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-    .glass::before {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 0%;
-      background: rgba(79,142,247,0.3);
-      transition: height 0.3s ease;
-    }
-    .glass.filled { border-color: var(--accent); }
-    .glass.filled::before { height: 100%; }
-    .glass:hover { transform: scale(1.1); }
-    .water-target { font-size: 0.72rem; color: var(--muted); margin-top: 8px; }
-    .water-count { font-size: 0.9rem; color: var(--accent); font-weight: 600; }
+/* ── Bullet lists ── */
+.bullets{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.bullets li{display:flex;gap:10px;font-size:.83rem;line-height:1.5;}
+.bullets li::before{content:'';display:block;width:6px;height:6px;border-radius:50%;margin-top:7px;flex-shrink:0;}
+.bullets.good li::before{background:var(--green);}
+.bullets.warn li::before{background:var(--amber);}
+.bullets.bad li::before{background:var(--red);}
+.bullets.info li::before{background:var(--blue);}
 
-    /* ── Meal checklist ── */
-    .meal-section { margin-bottom: 14px; }
-    .meal-label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--muted);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .meal-label .time-chip {
-      background: var(--surface2);
-      border-radius: 5px;
-      padding: 1px 7px;
-      font-size: 0.68rem;
-      color: var(--accent);
-    }
-    .check-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.15s;
-      margin-bottom: 4px;
-    }
-    .check-item:hover { background: var(--surface2); }
-    .check-item input[type="checkbox"] { margin-top: 2px; accent-color: var(--green); width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
-    .check-item label { font-size: 0.82rem; cursor: pointer; line-height: 1.4; }
-    .check-item label.done { text-decoration: line-through; color: var(--muted); }
+/* ── Progress bars ── */
+.pb-row{margin-bottom:11px;}
+.pb-hdr{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:5px;}
+.pb-hdr .lbl{}
+.pb-hdr .val{color:var(--muted);}
+.pb-bg{height:8px;background:#1e2a3a;border-radius:99px;overflow:hidden;}
+.pb-fill{height:100%;border-radius:99px;transition:width .8s ease;}
+.pb-green{background:var(--green);}
+.pb-amber{background:var(--amber);}
+.pb-red{background:var(--red);}
+.pb-blue{background:linear-gradient(90deg,var(--blue),var(--purple));}
 
-    /* ── Condition pills ── */
-    .condition-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 6px;
-    }
-    .pill {
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 500;
-    }
-    .pill.alert { background: rgba(239,68,68,.12); color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
-    .pill.warn { background: rgba(245,158,11,.1); color: #fcd34d; border: 1px solid rgba(245,158,11,.25); }
-    .pill.info { background: rgba(79,142,247,.1); color: #93c5fd; border: 1px solid rgba(79,142,247,.25); }
+/* ── Callout boxes ── */
+.callout{border-radius:8px;padding:12px 15px;font-size:.82rem;line-height:1.6;margin-top:10px;}
+.callout.green{background:var(--green-dim);border:1px solid rgba(34,197,94,.2);}
+.callout.amber{background:var(--amber-dim);border:1px solid rgba(245,158,11,.2);}
+.callout.red{background:var(--red-dim);border:1px solid rgba(239,68,68,.2);}
+.callout.blue{background:var(--blue-dim);border:1px solid rgba(79,142,247,.2);}
+.callout strong{display:block;margin-bottom:4px;}
 
-    /* ── Diet rules ── */
-    .rule-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .rule-row:last-child { border-bottom: none; }
-    .rule-icon { font-size: 1rem; flex-shrink: 0; width: 22px; text-align: center; margin-top: 1px; }
-    .rule-body .rule-title { font-size: 0.82rem; font-weight: 600; }
-    .rule-body .rule-detail { font-size: 0.75rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+/* ── Number list ── */
+.num-list{counter-reset:nl;display:flex;flex-direction:column;gap:10px;}
+.num-list li{counter-increment:nl;display:flex;gap:12px;font-size:.83rem;line-height:1.5;}
+.num-list li::before{content:counter(nl);display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--blue-dim);color:var(--blue);font-size:.72rem;font-weight:700;flex-shrink:0;margin-top:1px;}
 
-    /* ── Progress section ── */
-    .prog-row { margin-bottom: 12px; }
-    .prog-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
-    .prog-name { font-size: 0.78rem; }
-    .prog-val { font-size: 0.78rem; color: var(--muted); }
-    .prog-bar {
-      height: 7px;
-      background: var(--surface2);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-    .prog-fill {
-      height: 100%;
-      border-radius: 99px;
-      background: var(--green);
-    }
-    .prog-fill.warn { background: var(--yellow); }
-    .prog-fill.blue { background: var(--accent); }
-    .prog-fill.purple { background: var(--accent2); }
+/* ── Workout cards ── */
+.workout-day{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;font-size:.82rem;margin-bottom:4px;}
+.workout-day.today{background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.25);}
+.workout-day .wd-label{width:90px;flex-shrink:0;font-weight:600;font-size:.75rem;}
+.workout-day .wd-type{flex:1;}
+.wd-arrow{color:var(--blue);font-weight:700;margin-right:4px;}
 
-    /* ── Tabs ── */
-    .tabs { display: flex; gap: 4px; margin-bottom: 14px; background: var(--surface2); border-radius: 9px; padding: 4px; }
-    .tab { flex: 1; padding: 7px; border-radius: 7px; font-size: 0.75rem; font-weight: 500; text-align: center; cursor: pointer; color: var(--muted); transition: all 0.2s; border: none; background: transparent; }
-    .tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,.4); }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+.exercise-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(42,51,71,.5);font-size:.82rem;}
+.exercise-row:last-child{border-bottom:none;}
+.exercise-row .sets{color:var(--blue);font-weight:600;white-space:nowrap;}
 
-    /* ── Foods avoid/include ── */
-    .food-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .food-col h4 { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
-    .food-col.green h4 { color: var(--green); }
-    .food-col.red h4 { color: var(--red); }
-    .food-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--surface2);
-      border-radius: 7px;
-      padding: 5px 9px;
-      font-size: 0.75rem;
-      margin: 3px 2px;
-    }
+/* ── Food log ── */
+.food-row{display:flex;justify-content:space-between;padding:5px 0;font-size:.8rem;border-bottom:1px solid rgba(42,51,71,.4);}
+.food-row:last-child{border-bottom:none;}
+.food-row .kcal{color:var(--muted);}
+.meal-head{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:10px 0 4px;}
 
-    /* ── Med timing ── */
-    .med-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      background: var(--surface2);
-      border-radius: 9px;
-      margin-bottom: 8px;
-    }
-    .med-time { font-size: 0.75rem; color: var(--accent); font-weight: 600; width: 60px; flex-shrink: 0; }
-    .med-name { font-size: 0.82rem; font-weight: 500; }
-    .med-note { font-size: 0.72rem; color: var(--muted); }
-    .med-check input { accent-color: var(--green); }
-    .med-check { margin-left: auto; }
+/* ── Weight ring ── */
+.weight-ring-wrap{display:flex;align-items:center;gap:20px;}
+.wring-info .wval{font-size:2rem;font-weight:800;}
+.wring-info .wlbl{font-size:.75rem;color:var(--muted);margin-top:2px;}
 
-    /* ── Section spacing ── */
-    .section { margin-bottom: 20px; }
-
-    /* ── Insight box ── */
-    .insight {
-      background: linear-gradient(135deg, rgba(79,142,247,.08), rgba(124,92,244,.08));
-      border: 1px solid rgba(79,142,247,.25);
-      border-radius: 10px;
-      padding: 14px 16px;
-      font-size: 0.82rem;
-      line-height: 1.6;
-    }
-    .insight .insight-title { font-weight: 600; color: var(--accent); margin-bottom: 6px; font-size: 0.85rem; }
-
-    /* ── Scrollable ── */
-    .scroll-x { overflow-x: auto; }
-
-    /* ── Animate in ── */
-    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
-    .card { animation: fadeUp .35s ease both; }
-    .card:nth-child(1) { animation-delay: .05s; }
-    .card:nth-child(2) { animation-delay: .1s; }
-    .card:nth-child(3) { animation-delay: .15s; }
-    .card:nth-child(4) { animation-delay: .2s; }
-  </style>
+/* ── Animate ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.card{animation:fadeUp .3s ease both;}
+.section:nth-child(1) .card{animation-delay:.05s;}
+.section:nth-child(2) .card{animation-delay:.1s;}
+.section:nth-child(3) .card{animation-delay:.15s;}
+.section:nth-child(4) .card{animation-delay:.2s;}
+.section:nth-child(5) .card{animation-delay:.25s;}
+.section:nth-child(6) .card{animation-delay:.3s;}
+.section:nth-child(7) .card{animation-delay:.35s;}
+</style>
 </head>
 <body>
 
-<!-- ── Header ── -->
-<div class="header">
-  <div class="header-left">
-    <h1>🥗 Daily Diet Review</h1>
-    <div class="subtitle">Personalized nutrition · Raghav Chadha</div>
-  </div>
-  <div class="date-badge">
-    <strong id="today-date"></strong>
-    <span id="today-time"></span>
+<!-- ═══ HEADER ═══ -->
+<div class="hdr">
+  <div class="hdr-inner">
+    <div>
+      <h1>🏋️ Daily <span>Health Coaching Briefing</span></h1>
+      <div class="meta">Covering Tuesday, June 24, 2026 · Raghav Chadha · Generated Jun 25 at 8:05 AM</div>
+    </div>
+    <div class="badge-row">
+      <span class="badge green">Recovery 94% 🟢</span>
+      <span class="badge amber">Sleep 6.3h ⚠️</span>
+      <span class="badge amber">Protein 103g ⚠️</span>
+    </div>
   </div>
 </div>
 
-<!-- ── WHOOP Recovery Row ── -->
+<div class="wrap">
+
+<!-- ═══ SECTION 1: What's Working Well ═══ -->
 <div class="section">
-  <div class="grid-2" style="margin-bottom:16px;">
-    <!-- Recovery card -->
-    <div class="card">
-      <div class="card-title"><span class="dot green"></span>WHOOP Recovery</div>
-      <div class="recovery-wrap">
-        <svg class="ring-svg" width="80" height="80" viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r="32" fill="none" stroke="#2e3348" stroke-width="8"/>
-          <circle cx="40" cy="40" r="32" fill="none" stroke="#22c55e" stroke-width="8"
-            stroke-dasharray="201.06" stroke-dashoffset="12.06"
-            stroke-linecap="round" transform="rotate(-90 40 40)"/>
-          <text x="40" y="45" text-anchor="middle" fill="#22c55e" font-size="15" font-weight="800">94%</text>
-        </svg>
-        <div class="ring-info">
-          <div class="score">94%</div>
-          <div class="label">Recovery Score</div>
-          <div class="status">Well Recovered</div>
-          <div class="hrv-rhr">
-            <div class="mini">
-              <div class="mv text-green">98 ms</div>
-              <div class="ml">HRV</div>
-            </div>
-            <div class="mini">
-              <div class="mv text-accent">44 bpm</div>
-              <div class="ml">Resting HR</div>
-            </div>
-            <div class="mini">
-              <div class="mv" style="color:#a78bfa">96.7%</div>
-              <div class="ml">SpO₂</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Today strain + calories -->
-    <div class="card">
-      <div class="card-title"><span class="dot yellow"></span>Today's Energy</div>
-      <div class="grid-2" style="gap:8px; margin-bottom:14px;">
-        <div class="metric-stat">
-          <div class="val text-yellow">2.6</div>
-          <div class="unit">/ 21 max</div>
-          <div class="label">Day Strain</div>
-        </div>
-        <div class="metric-stat">
-          <div class="val text-accent">744</div>
-          <div class="unit">kcal</div>
-          <div class="label">Calories Burned</div>
-        </div>
-      </div>
-
-      <div style="font-size:.75rem; color:var(--muted); margin-bottom:5px;">Calorie target progress (goal: 2,200 kcal)</div>
-      <div class="cal-row">
-        <div class="cal-bar-bg"><div class="cal-bar-fill" style="width:34%"></div></div>
-        <div class="cal-num">744 / 2,200</div>
-      </div>
-      <div style="margin-top:10px; font-size:.72rem; color:var(--muted);">
-        Light strain today → prioritise nutrient density over calories. Adjust if workouts added later.
-      </div>
-    </div>
-  </div>
-
-  <!-- 4-metric row -->
+  <div class="section-title">✓ What's Working Well</div>
   <div class="card">
-    <div class="card-title"><span class="dot"></span>Sleep from Last Night</div>
-    <div class="grid-4">
-      <div class="metric-stat">
-        <div class="val text-accent">6h 16m</div>
-        <div class="label">Total Sleep</div>
-      </div>
-      <div class="metric-stat">
-        <div class="val text-yellow">80%</div>
-        <div class="label">Performance</div>
-      </div>
-      <div class="metric-stat">
-        <div class="val text-green">1h 27m</div>
-        <div class="label">REM</div>
-      </div>
-      <div class="metric-stat">
-        <div class="val text-green">1h 5m</div>
-        <div class="label">Deep Sleep</div>
-      </div>
-    </div>
-    <div class="insight" style="margin-top:14px;">
-      <div class="insight-title">💡 Sleep & Nutrition Insight</div>
-      Sleep was slightly short (target 7–9 h). Short sleep elevates ghrelin (hunger hormone) and cortisol.
-      Focus on protein-rich breakfast and whole foods to stabilise appetite today. Avoid refined carbs that spike blood sugar.
+    <div class="card-title"><span class="dot dot-blue"></span>Key Metrics — Yesterday vs. Trends</div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Yesterday (Jun 24)</th>
+          <th>7-Day Avg</th>
+          <th>30-Day Avg</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Recovery %</td>
+          <td><strong class="green">94%</strong></td>
+          <td>64%</td>
+          <td>67%</td>
+          <td><span class="chip g">↑ Best of Month</span></td>
+        </tr>
+        <tr>
+          <td>HRV (ms)</td>
+          <td><strong class="green">98.0 ms</strong></td>
+          <td>69.4 ms</td>
+          <td>66.3 ms</td>
+          <td><span class="chip g">↑ +41% above avg</span></td>
+        </tr>
+        <tr>
+          <td>Resting HR (bpm)</td>
+          <td><strong class="green">44 bpm</strong></td>
+          <td>51 bpm</td>
+          <td>51 bpm</td>
+          <td><span class="chip g">↓ Excellent</span></td>
+        </tr>
+        <tr>
+          <td>Sleep Duration (h)</td>
+          <td><span class="amber">6.3h</span></td>
+          <td>6.6h</td>
+          <td>6.4h</td>
+          <td><span class="chip a">⚠️ Below 7h target</span></td>
+        </tr>
+        <tr>
+          <td>Sleep Efficiency (%)</td>
+          <td><strong class="green">91%</strong></td>
+          <td>89%</td>
+          <td>90%</td>
+          <td><span class="chip g">✓ On track</span></td>
+        </tr>
+        <tr>
+          <td>Sleep Performance (%)</td>
+          <td><span class="amber">80%</span></td>
+          <td>72%</td>
+          <td>75%</td>
+          <td><span class="chip g">↑ Above average</span></td>
+        </tr>
+        <tr>
+          <td>Day Strain</td>
+          <td>4.5</td>
+          <td>5.9</td>
+          <td>6.9</td>
+          <td><span class="chip a">Light day</span></td>
+        </tr>
+        <tr>
+          <td>WHOOP Calories (kcal)</td>
+          <td>1,845 kcal</td>
+          <td>1,969 kcal</td>
+          <td>2,016 kcal</td>
+          <td><span class="chip a">Below avg burn</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:16px;">
+      <ul class="bullets good">
+        <li><strong>Recovery 94% — best day in 30 days.</strong> HRV hit 98.0 ms, 41% above your 7-day average of 69.4 ms, signalling excellent parasympathetic tone after Monday's 9.3h sleep.</li>
+        <li><strong>Resting HR at 44 bpm</strong> — 7 bpm below your 7-day average. Combined with high HRV, this is your body in peak readiness. A strong signal to train hard today.</li>
+        <li><strong>Sleep efficiency 91%</strong> — time in bed is being used well. The quality is there; the duration just needs extending.</li>
+        <li><strong>Steps at 8,493 on Tuesday</strong> — solid non-exercise activity for a rest/cardio day.</li>
+      </ul>
     </div>
   </div>
 </div>
 
-<!-- ── Conditions + Dietary Rules ── -->
+<!-- ═══ SECTION 2: Nutrition ═══ -->
 <div class="section">
-  <div class="grid-2">
-    <!-- Active conditions -->
+  <div class="section-title">📋 Nutrition</div>
+  <div class="g2">
+    <!-- Calories + Macros -->
     <div class="card">
-      <div class="card-title"><span class="dot red"></span>Active Conditions Affecting Diet</div>
-      <div class="condition-pills">
-        <span class="pill alert">Panhypopituitarism</span>
-        <span class="pill alert">Craniopharyngioma</span>
-        <span class="pill warn">NAFLD</span>
-        <span class="pill warn">Diabetes Mellitus</span>
-        <span class="pill warn">Hypothyroidism</span>
-        <span class="pill warn">High Cholesterol</span>
-        <span class="pill info">Adrenal Insufficiency</span>
-        <span class="pill info">Diabetes Insipidus</span>
-        <span class="pill info">Hypogonadism</span>
+      <div class="card-title"><span class="dot dot-amber"></span>Lose It! — Tuesday Jun 23 <span style="font-size:.65rem;color:var(--muted);margin-left:4px;">(most recent; Jun 24 email arrives ~noon)</span></div>
+
+      <div class="g4" style="margin-bottom:16px;">
+        <div class="stat">
+          <div class="v amber">2,287</div>
+          <div class="u">kcal consumed</div>
+          <div class="l">Budget: 2,117</div>
+        </div>
+        <div class="stat">
+          <div class="v red">+170</div>
+          <div class="u">over budget</div>
+          <div class="l">Net: 2,287</div>
+        </div>
+        <div class="stat">
+          <div class="v" style="color:#a78bfa">1,845</div>
+          <div class="u">WHOOP burned</div>
+          <div class="l">Jun 24</div>
+        </div>
+        <div class="stat">
+          <div class="v blue">8,493</div>
+          <div class="u">steps</div>
+          <div class="l">From Lose It!</div>
+        </div>
       </div>
 
-      <div style="margin-top:16px;">
-        <div class="rule-row">
-          <div class="rule-icon">🫀</div>
-          <div class="rule-body">
-            <div class="rule-title">NAFLD + High Cholesterol</div>
-            <div class="rule-detail">Avoid added sugar, trans fat, fried foods. Prioritise omega-3s (salmon, walnuts), soluble fibre (oats, beans), and olive oil.</div>
-          </div>
-        </div>
-        <div class="rule-row">
-          <div class="rule-icon">🩸</div>
-          <div class="rule-body">
-            <div class="rule-title">Diabetes Mellitus</div>
-            <div class="rule-detail">Low glycaemic index foods. Pair carbs with protein/fat. Consistent meal timing to avoid glucose spikes. Avoid sugary drinks.</div>
-          </div>
-        </div>
-        <div class="rule-row">
-          <div class="rule-icon">🦋</div>
-          <div class="rule-body">
-            <div class="rule-title">Hypothyroidism (Secondary)</div>
-            <div class="rule-detail">Take thyroid meds 30–60 min before eating. Limit raw cruciferous veg in excess. Ensure adequate selenium (Brazil nuts, eggs) and iodine.</div>
-          </div>
-        </div>
-        <div class="rule-row">
-          <div class="rule-icon">🧂</div>
-          <div class="rule-body">
-            <div class="rule-title">Adrenal Insufficiency</div>
-            <div class="rule-detail">Don't skip meals — risk of adrenal crisis. Slightly higher sodium needs. Take hydrocortisone with or just after food to avoid nausea.</div>
-          </div>
-        </div>
-        <div class="rule-row">
-          <div class="rule-icon">💧</div>
-          <div class="rule-body">
-            <div class="rule-title">Diabetes Insipidus</div>
-            <div class="rule-detail">Critical: monitor fluid intake/output. Avoid excessive water (risk of hyponatremia on DDAVP). Limit high-sodium processed foods.</div>
-          </div>
-        </div>
+      <div class="pb-row">
+        <div class="pb-hdr"><span class="lbl">Protein</span><span class="val">103g <span class="red">⚠️ vs 130g target</span></span></div>
+        <div class="pb-bg"><div class="pb-fill pb-amber" style="width:79%"></div></div>
+      </div>
+      <div class="pb-row">
+        <div class="pb-hdr"><span class="lbl">Carbohydrates</span><span class="val">189g</span></div>
+        <div class="pb-bg"><div class="pb-fill pb-blue" style="width:68%"></div></div>
+      </div>
+      <div class="pb-row">
+        <div class="pb-hdr"><span class="lbl">Fat (total)</span><span class="val">104g <span class="red">⚠️ 42g saturated</span></span></div>
+        <div class="pb-bg"><div class="pb-fill pb-red" style="width:80%"></div></div>
+      </div>
+      <div class="pb-row">
+        <div class="pb-hdr"><span class="lbl">Fiber</span><span class="val">13g <span class="amber">vs 30g target</span></span></div>
+        <div class="pb-bg"><div class="pb-fill pb-amber" style="width:43%"></div></div>
+      </div>
+      <div class="pb-row">
+        <div class="pb-hdr"><span class="lbl">Sodium</span><span class="val"><span class="red">3,645mg ⚠️ Very high</span></span></div>
+        <div class="pb-bg"><div class="pb-fill pb-red" style="width:100%"></div></div>
       </div>
     </div>
 
-    <!-- Foods to eat / avoid -->
+    <!-- Food Log -->
     <div class="card">
-      <div class="card-title"><span class="dot purple"></span>Personalised Food Guide</div>
-      <div class="tabs">
-        <button class="tab active" onclick="switchTab(this,'eat')">✅ Prioritise</button>
-        <button class="tab" onclick="switchTab(this,'avoid')">🚫 Avoid</button>
-        <button class="tab" onclick="switchTab(this,'macros')">📊 Macros</button>
-      </div>
+      <div class="card-title"><span class="dot dot-amber"></span>Daily Food Log — Tue Jun 23</div>
 
-      <div id="tab-eat" class="tab-panel active">
-        <div class="food-cols">
-          <div class="food-col green">
-            <h4>🟢 Include Daily</h4>
-            <div><span class="food-tag">🐟 Salmon / sardines</span><span class="food-tag">🥑 Avocado</span><span class="food-tag">🫐 Blueberries</span><span class="food-tag">🥚 Eggs</span><span class="food-tag">🥦 Cooked broccoli</span><span class="food-tag">🍠 Sweet potato</span><span class="food-tag">🥣 Rolled oats</span><span class="food-tag">🫘 Lentils / beans</span><span class="food-tag">🥜 Walnuts</span><span class="food-tag">🫒 Olive oil</span><span class="food-tag">🧄 Garlic</span><span class="food-tag">🌿 Brazil nuts (selenium)</span></div>
-          </div>
-          <div class="food-col red">
-            <h4>🔴 Limit or Avoid</h4>
-            <div><span class="food-tag">🍬 Added sugar</span><span class="food-tag">🍟 Fried foods</span><span class="food-tag">🥤 Sugary drinks</span><span class="food-tag">🍞 White bread</span><span class="food-tag">🍺 Alcohol</span><span class="food-tag">🥩 Processed meats</span><span class="food-tag">🧈 Trans fats</span><span class="food-tag">🥛 Excess dairy fat</span><span class="food-tag">🧂 High-sodium snacks</span><span class="food-tag">🥬 Excessive raw kale (thyroid)</span></div>
-          </div>
-        </div>
-      </div>
+      <div class="meal-head">Lunch — 1,577 kcal</div>
+      <div class="food-row"><span>Pizza, 14" Sausage Thin Crust × 5 slices</span><span class="kcal">1,410</span></div>
+      <div class="food-row"><span>Beer, Guinness × 16 fl oz</span><span class="kcal red">167 ⚠️</span></div>
 
-      <div id="tab-avoid" class="tab-panel">
-        <div class="rule-row">
-          <div class="rule-icon">⚠️</div>
-          <div class="rule-body">
-            <div class="rule-title">Alcohol</div>
-            <div class="rule-detail">Worsens NAFLD, interferes with adrenal meds, disrupts sleep. Avoid entirely.</div>
-          </div>
-        </div>
-        <div class="rule-row">
-          <div class="rule-icon">⚠️</div>
-          <div class="rule-body">
-            <div class="rule-title">Ultra-processed foods</div>
-            <div class="rule-detail">Spike blood sugar, worsen liver fat, raise cholesterol. Replace with whole-food alternatives.</div>
-          </div>
-        </div>
-        <div class="rule-row">
-          <div class="rule-icon">⚠️</div>
-          <div class="rule-body">
-            <div class="rule-title">Grapefruit / grapefruit juice</div>
-            <div class="rule-detail">Interacts with many medications. Avoid unless cleared by prescriber.</div>
-          </div>
-        </div>
-        <div class="rule-row">
-          <div class="rule-icon">⚠️</div>
-          <div class="rule-body">
-            <div class="rule-title">Skipping meals</div>
-            <div class="rule-detail">With adrenal insufficiency, meal skipping can precipitate a crisis. Eat on schedule.</div>
-          </div>
-        </div>
-      </div>
+      <div class="meal-head">Dinner — 622 kcal</div>
+      <div class="food-row"><span>Mutton/Goat Biryani × 0.67 serving</span><span class="kcal">434</span></div>
+      <div class="food-row"><span>Greek Yogurt, Vanilla × 193g</span><span class="kcal">114</span></div>
+      <div class="food-row"><span>Greek Yogurt, Plain Whole Milk × 75g</span><span class="kcal">75</span></div>
 
-      <div id="tab-macros" class="tab-panel">
-        <div class="prog-row">
-          <div class="prog-header"><span class="prog-name">Protein</span><span class="prog-val">Target: 130–150 g/day</span></div>
-          <div class="prog-bar"><div class="prog-fill blue" style="width:0%" id="protein-bar"></div></div>
-        </div>
-        <div class="prog-row">
-          <div class="prog-header"><span class="prog-name">Fibre</span><span class="prog-val">Target: 30–35 g/day</span></div>
-          <div class="prog-bar"><div class="prog-fill" style="width:0%" id="fibre-bar"></div></div>
-        </div>
-        <div class="prog-row">
-          <div class="prog-header"><span class="prog-name">Healthy Fats (mono/poly)</span><span class="prog-val">Target: 60–70 g/day</span></div>
-          <div class="prog-bar"><div class="prog-fill purple" style="width:0%" id="fat-bar"></div></div>
-        </div>
-        <div class="prog-row">
-          <div class="prog-header"><span class="prog-name">Net Carbs (low-GI)</span><span class="prog-val">Target: &lt;150 g/day</span></div>
-          <div class="prog-bar"><div class="prog-fill warn" style="width:0%" id="carb-bar"></div></div>
-        </div>
-        <div style="margin-top:12px;">
-          <div style="font-size:.75rem; color:var(--muted); margin-bottom:8px;">Log today's estimated intake:</div>
-          <div class="grid-2" style="gap:8px;">
-            <div><label style="font-size:.72rem;color:var(--muted);">Protein (g)</label><input type="number" id="in-protein" placeholder="0" min="0" max="300" oninput="updateMacros()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:6px 10px;font-size:.85rem;margin-top:3px;"></div>
-            <div><label style="font-size:.72rem;color:var(--muted);">Fibre (g)</label><input type="number" id="in-fibre" placeholder="0" min="0" max="100" oninput="updateMacros()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:6px 10px;font-size:.85rem;margin-top:3px;"></div>
-            <div><label style="font-size:.72rem;color:var(--muted);">Healthy Fats (g)</label><input type="number" id="in-fat" placeholder="0" min="0" max="200" oninput="updateMacros()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:6px 10px;font-size:.85rem;margin-top:3px;"></div>
-            <div><label style="font-size:.72rem;color:var(--muted);">Net Carbs (g)</label><input type="number" id="in-carbs" placeholder="0" min="0" max="400" oninput="updateMacros()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:6px 10px;font-size:.85rem;margin-top:3px;"></div>
-          </div>
-        </div>
+      <div class="meal-head">Snacks — 87 kcal</div>
+      <div class="food-row"><span>Mozzarella Pearls × 8 pieces</span><span class="kcal">70</span></div>
+      <div class="food-row"><span>Tomatoes, Grape × 5</span><span class="kcal">7</span></div>
+      <div class="food-row"><span>Olives, Green × 2</span><span class="kcal">10</span></div>
+
+      <div class="callout amber" style="margin-top:12px;">
+        <strong>⚠️ Coaching note on lunch</strong>
+        5 slices of sausage pizza + a pint of Guinness delivered 42g saturated fat and 3,645mg sodium — both serious flags given NAFLD and cardiovascular history. Alcohol is a direct hepatotoxin at any amount with fatty liver disease.
       </div>
     </div>
   </div>
 </div>
 
-<!-- ── Meals + Meds + Hydration ── -->
+<!-- ═══ SECTION 3: Areas Needing Attention ═══ -->
 <div class="section">
-  <div class="grid-3">
-    <!-- Meal Checklist -->
-    <div class="card">
-      <div class="card-title"><span class="dot green"></span>Meal Checklist</div>
-
-      <div class="meal-section">
-        <div class="meal-label">☀️ Breakfast <span class="time-chip">7–8 AM</span></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Eggs + avocado on whole-grain toast</label></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Greek yoghurt with blueberries &amp; walnuts</label></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Oatmeal with chia seeds (no added sugar)</label></div>
-      </div>
-
-      <div class="meal-section">
-        <div class="meal-label">🌤️ Mid-Morning <span class="time-chip">10–11 AM</span></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Brazil nuts (2–3, selenium source)</label></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Apple or pear (low GI)</label></div>
-      </div>
-
-      <div class="meal-section">
-        <div class="meal-label">🌞 Lunch <span class="time-chip">12–1 PM</span></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Salmon or sardines with lentil salad</label></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Olive oil + lemon dressing</label></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Large serving of leafy greens</label></div>
-      </div>
-
-      <div class="meal-section">
-        <div class="meal-label">🌅 Dinner <span class="time-chip">6–7 PM</span></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Lean protein (chicken, turkey, tofu)</label></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Roasted vegetables (broccoli, sweet potato)</label></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>No refined carbs after 6 PM</label></div>
-      </div>
-    </div>
-
-    <!-- Medication Timing -->
-    <div class="card">
-      <div class="card-title"><span class="dot purple"></span>Medication & Food Timing</div>
-
-      <div class="med-row">
-        <div class="med-time">6:00 AM</div>
-        <div>
-          <div class="med-name">DDAVP (Desmopressin)</div>
-          <div class="med-note">Take on empty stomach. Monitor thirst / urine output.</div>
-        </div>
-        <div class="med-check"><input type="checkbox" title="Taken"></div>
-      </div>
-
-      <div class="med-row">
-        <div class="med-time">6:30 AM</div>
-        <div>
-          <div class="med-name">Levothyroxine (Thyroid)</div>
-          <div class="med-note">30–60 min before breakfast. No calcium/iron within 4 h.</div>
-        </div>
-        <div class="med-check"><input type="checkbox" title="Taken"></div>
-      </div>
-
-      <div class="med-row">
-        <div class="med-time">7:00 AM</div>
-        <div>
-          <div class="med-name">Hydrocortisone (Morning dose)</div>
-          <div class="med-note">Take with or just after breakfast to reduce nausea.</div>
-        </div>
-        <div class="med-check"><input type="checkbox" title="Taken"></div>
-      </div>
-
-      <div class="med-row">
-        <div class="med-time">12:00 PM</div>
-        <div>
-          <div class="med-name">Hydrocortisone (Midday dose)</div>
-          <div class="med-note">Take with lunch. Do not take late — disrupts cortisol rhythm.</div>
-        </div>
-        <div class="med-check"><input type="checkbox" title="Taken"></div>
-      </div>
-
-      <div class="med-row">
-        <div class="med-time">Evening</div>
-        <div>
-          <div class="med-name">Testosterone / other hormones</div>
-          <div class="med-note">Per prescriber schedule. Take with food if GI upset.</div>
-        </div>
-        <div class="med-check"><input type="checkbox" title="Taken"></div>
-      </div>
-
-      <div class="insight" style="margin-top:14px;">
-        <div class="insight-title">⚠️ Adrenal Sick-Day Rule</div>
-        If unwell, vomiting, or high stress today: double hydrocortisone dose and contact your endocrinologist immediately.
-      </div>
-    </div>
-
-    <!-- Hydration -->
-    <div class="card">
-      <div class="card-title"><span class="dot"></span>Hydration Tracker</div>
-
-      <div style="font-size:.78rem; color:var(--muted); margin-bottom:10px; line-height:1.5;">
-        <strong style="color:var(--text);">Diabetes insipidus note:</strong> Don't over-hydrate on DDAVP — risk of hyponatraemia. Drink to thirst only. Target <strong style="color:var(--accent);">~8 cups</strong> unless your endocrinologist advises otherwise.
-      </div>
-
-      <div class="water-glasses" id="glasses"></div>
-      <div class="water-target" id="water-label">Tap a glass to log</div>
-
-      <div style="margin-top:16px;">
-        <div style="font-size:.72rem; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:.05em; font-weight:600;">Today's fluid log</div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Morning glass with meds ✓</label></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Herbal tea (no calcium supplements within 4 h of Levothyroxine)</label></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>No sugary drinks all day</label></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Urine colour pale yellow (good hydration sign)</label></div>
-      </div>
-
-      <div style="margin-top:16px;">
-        <div style="font-size:.72rem; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.05em; font-weight:600;">Supplements to consider</div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Vitamin D (low sun exposure / panhypopituitarism)</label></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Omega-3 fish oil (NAFLD + cholesterol)</label></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>Magnesium glycinate (sleep quality, muscle)</label></div>
-        <div class="check-item" onclick="toggle(this)"><input type="checkbox"><label>CoQ10 (if on statins)</label></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── Daily Summary ── -->
-<div class="section">
+  <div class="section-title">⚠️ Areas Needing Attention</div>
   <div class="card">
-    <div class="card-title"><span class="dot green"></span>Today's Diet Score</div>
-    <div id="score-display" style="text-align:center; padding: 10px 0 4px;">
-      <div style="font-size:3rem; font-weight:800; color:var(--green);" id="score-num">—</div>
-      <div style="font-size:.85rem; color:var(--muted);">Check items above to calculate score</div>
-    </div>
-    <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;" id="score-badges"></div>
+    <ul class="bullets warn">
+      <li><strong>Protein consistently below target.</strong> 103g consumed vs. 130–150g recommended for lean mass building with GHD and testosterone therapy. This pattern undermines the anabolic window created by your hormone replacement. Protein has been under target on most logged days.</li>
+      <li><strong>Sleep duration averaging 6.4h (30-day) vs. 7h+ target.</strong> 5 of the last 7 nights were under 7 hours. Chronic short sleep raises cortisol, suppresses GH pulse amplitude, and makes weight management harder — compounded by your panhypopituitarism. This is a top-priority lever.</li>
+      <li><strong>Saturated fat at 42g Tuesday</strong> — more than 2× the recommended limit for someone with NAFLD and hypercholesterolemia. Sausage pizza + mozzarella is a high-sat-fat combination that directly worsens liver fat accumulation.</li>
+      <li><strong>Sodium at 3,645mg — well above the 2,300mg general limit</strong>, and problematic given adrenal insufficiency management requires careful fluid/electrolyte balance with desmopressin. High sodium can cause paradoxical fluid retention on DDAVP.</li>
+      <li><strong>Alcohol (Guinness 16 fl oz) on a weekday.</strong> Alcohol is metabolised as a toxin by the liver, directly worsening NAFLD. It also disrupts hydrocortisone effectiveness and sleep architecture — your HRV dip Tuesday (70.7ms vs 98ms Wednesday) reflects this.</li>
+      <li><strong>Fiber at only 13g vs 30g target.</strong> Low fiber combined with high refined carbs (pizza dough) spikes postprandial glucose, problematic alongside diabetes and high cholesterol. Fiber deficiency also impacts bile acid clearance.</li>
+      <li><strong>Day strain tracking light (4.5 vs 6.9 30-day avg) on a scheduled cardio day.</strong> Tuesday should have been a cardio session — no exercise logged in Lose It! confirms this was likely missed.</li>
+    </ul>
   </div>
 </div>
 
-<script>
-  // ── Date/time ──
-  function updateClock() {
-    const now = new Date();
-    document.getElementById('today-date').textContent = now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
-    document.getElementById('today-time').textContent = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
-  }
-  updateClock();
-  setInterval(updateClock, 1000);
+<!-- ═══ SECTION 4: Top 3 Recommendations ═══ -->
+<div class="section">
+  <div class="section-title">🎯 Top 3 Actionable Recommendations — Next 24 Hours</div>
+  <div class="card">
+    <ol class="num-list">
+      <li>
+        <div>
+          <strong>Hit 130g+ protein today — log every meal.</strong> You're at 103g on the best-tracked days. Today is a Pull (strength) day — your muscles need amino acids to rebuild after the workout. Plan: protein shake post-workout (30g), eggs at breakfast (18g), chicken at lunch (50g), Greek yogurt snack (15g), fish or lean meat at dinner (40g). That's &gt;150g. Panhypopituitarism reduces muscle protein synthesis baseline — the margin for hitting protein targets is smaller than average.
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Eliminate alcohol completely and swap pizza for a Mediterranean-style lunch.</strong> Your 7-day HRV average dropped to 69.4ms — Tuesday's Guinness + pizza almost certainly contributed to the dip (70.7ms Tuesday vs 98ms after a clean Wednesday). With NAFLD confirmed, even one drink causes measurable liver enzyme elevation. Replace the pizza habit with salmon + quinoa or a chicken grain bowl — same calories, drastically better macro and fat profile.
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Add 45 minutes to your bedtime tonight and protect that window.</strong> You've averaged 6.4h over 30 days vs. a 7h target. Growth hormone (even with Humatrope) peaks during deep sleep — getting more sleep directly amplifies your HGH therapy. Set a hard lights-out alarm for 10:15 PM. No screens after 9:30 PM. Your recovery today is 94% — the body is ready. Don't waste it with short sleep tonight.
+        </div>
+      </li>
+    </ol>
+  </div>
+</div>
 
-  // ── Checkbox toggle ──
-  function toggle(row) {
-    const cb = row.querySelector('input[type="checkbox"]');
-    const lbl = row.querySelector('label');
-    if (event.target !== cb) cb.checked = !cb.checked;
-    if (cb.checked) lbl.classList.add('done');
-    else lbl.classList.remove('done');
-    updateScore();
-  }
+<!-- ═══ SECTION 5: Weight Loss Progress ═══ -->
+<div class="section">
+  <div class="section-title">📊 Weight Loss Progress</div>
+  <div class="card">
+    <div class="g2" style="gap:20px; align-items:center;">
+      <div>
+        <table class="tbl">
+          <thead>
+            <tr><th>Milestone</th><th>Weight (lbs)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Starting Weight</td><td><strong>194 lbs</strong></td></tr>
+            <tr><td>10% Goal Weight</td><td><strong>175.5 lbs</strong> <span style="font-size:.7rem;color:var(--muted);">(Lose It! shows 171)</span></td></tr>
+            <tr class="row-hl"><td><strong>Current Weight (Jun 23)</strong></td><td><strong class="amber">193 lbs</strong></td></tr>
+            <tr><td>Lost So Far</td><td><strong class="green">1 lb</strong></td></tr>
+            <tr><td>Remaining to 10% Goal</td><td><span class="red">17.5 lbs</span></td></tr>
+            <tr><td>% of Goal Achieved</td><td><span class="amber">5.4%</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <!-- Donut ring -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+          <svg width="130" height="130" viewBox="0 0 130 130">
+            <circle cx="65" cy="65" r="52" fill="none" stroke="#1e2a3a" stroke-width="12"/>
+            <circle cx="65" cy="65" r="52" fill="none" stroke="#f59e0b" stroke-width="12"
+              stroke-dasharray="326.73" stroke-dashoffset="309"
+              stroke-linecap="round" transform="rotate(-90 65 65)"/>
+            <text x="65" y="60" text-anchor="middle" fill="#f59e0b" font-size="18" font-weight="800">5.4%</text>
+            <text x="65" y="77" text-anchor="middle" fill="#64748b" font-size="10">of goal</text>
+          </svg>
+          <div style="text-align:center;">
+            <div style="font-size:.78rem;color:var(--muted);">At 1 lb/week pace</div>
+            <div style="font-size:.85rem;font-weight:600;color:var(--amber);">~17–18 weeks to goal</div>
+          </div>
+        </div>
+        <div class="callout amber" style="margin-top:10px;">
+          <strong>Context</strong>
+          Slow progress (1 lb lost vs. starting weight) is expected with panhypopituitarism and multiple hormone deficiencies — weight management is genuinely harder. Keep logging consistently; even maintaining while building lean mass is progress.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-  // ── Tabs ──
-  function switchTab(btn, id) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-' + id).classList.add('active');
-  }
+<!-- ═══ SECTION 6: Today's Workout ═══ -->
+<div class="section">
+  <div class="section-title">🏋️ Today's Workout — Wednesday June 25</div>
+  <div class="g2">
+    <!-- Today's session -->
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>Routine B — Pull (Back, Biceps, Rear Delts)</div>
+      <div class="callout green" style="margin-bottom:14px;">
+        <strong>✅ Recovery 94% — Green Light. Train hard today.</strong>
+        HRV 98ms, RHR 44 bpm. This is your best readiness day in 30 days. Don't hold back.
+      </div>
+      <div class="exercise-row"><span>Pull-Ups or Lat Pulldown</span><span class="sets">4 × 8–10</span></div>
+      <div class="exercise-row"><span>Barbell or Cable Row</span><span class="sets">4 × 10</span></div>
+      <div class="exercise-row"><span>Single-Arm Dumbbell Row</span><span class="sets">3 × 10 (each side)</span></div>
+      <div class="exercise-row"><span>Face Pulls (cable)</span><span class="sets">3 × 15</span></div>
+      <div class="exercise-row"><span>Barbell or Dumbbell Curl</span><span class="sets">3 × 12</span></div>
+      <div class="exercise-row"><span>Hammer Curls</span><span class="sets">3 × 12</span></div>
+    </div>
 
-  // ── Water glasses ──
-  const GLASSES = 8;
-  let filled = 0;
-  const container = document.getElementById('glasses');
-  for (let i = 0; i < GLASSES; i++) {
-    const g = document.createElement('div');
-    g.className = 'glass';
-    g.title = 'Glass ' + (i+1);
-    g.textContent = '🥛';
-    g.dataset.idx = i;
-    g.addEventListener('click', () => {
-      const idx = parseInt(g.dataset.idx);
-      const glasses = document.querySelectorAll('.glass');
-      filled = idx + 1;
-      glasses.forEach((gl, j) => {
-        if (j < filled) gl.classList.add('filled');
-        else gl.classList.remove('filled');
-      });
-      document.getElementById('water-label').innerHTML =
-        `<span class="water-count">${filled} / ${GLASSES} cups</span> logged today`;
-      updateScore();
-    });
-    container.appendChild(g);
-  }
+    <!-- Weekly schedule -->
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>This Week's Schedule</div>
+      <div class="workout-day"><span class="wd-label">Monday</span><span class="wd-type">💪 Strength — Routine A (Push)</span></div>
+      <div class="workout-day"><span class="wd-label">Tuesday</span><span class="wd-type">🏃 Cardio — Squash / Bike / Walk / Golf</span></div>
+      <div class="workout-day today"><span class="wd-label"><span class="wd-arrow">▶</span> Wednesday</span><span class="wd-type blue"><strong>💪 Strength — Routine B (Pull)</strong></span></div>
+      <div class="workout-day"><span class="wd-label">Thursday</span><span class="wd-type">🏃 Cardio — Squash / Bike / Walk / Golf</span></div>
+      <div class="workout-day"><span class="wd-label">Friday</span><span class="wd-type">💪 Strength — Routine C (Legs + Core)</span></div>
+      <div class="workout-day"><span class="wd-label">Saturday</span><span class="wd-type">🏃 Cardio — Squash / Bike / Walk / Golf</span></div>
+      <div class="workout-day"><span class="wd-label">Sunday</span><span class="wd-type">😴 Rest — Light activity or full rest</span></div>
 
-  // ── Macros ──
-  function updateMacros() {
-    const targets = { protein: 150, fibre: 35, fat: 70, carbs: 150 };
-    const vals = {
-      protein: +document.getElementById('in-protein').value || 0,
-      fibre:   +document.getElementById('in-fibre').value   || 0,
-      fat:     +document.getElementById('in-fat').value     || 0,
-      carbs:   +document.getElementById('in-carbs').value   || 0,
-    };
-    for (const [k, t] of Object.entries(targets)) {
-      const pct = Math.min(100, Math.round(vals[k] / t * 100));
-      const bar = document.getElementById(k + '-bar') || document.getElementById(k === 'fat' ? 'fat-bar' : k + '-bar');
-      if (bar) bar.style.width = pct + '%';
-    }
-    updateScore();
-  }
+      <div class="callout blue" style="margin-top:14px;">
+        <strong>💡 Missed Tuesday Cardio</strong>
+        No exercise was logged in Lose It! on Tuesday and WHOOP strain was only 4.5. Consider making today's Pull session count double by adding a 15-min walk after the gym, and don't miss Thursday's cardio.
+      </div>
+    </div>
+  </div>
+</div>
 
-  // ── Score ──
-  function updateScore() {
-    const checks = document.querySelectorAll('.check-item input[type="checkbox"]');
-    const medChecks = document.querySelectorAll('.med-check input[type="checkbox"]');
-    const total = checks.length + medChecks.length;
-    let done = 0;
-    checks.forEach(c => { if (c.checked) done++; });
-    medChecks.forEach(c => { if (c.checked) done++; });
-    const hydration = filled >= 6 ? 1 : 0;
-    const overall = Math.round(((done + hydration) / (total + 1)) * 100);
-    const el = document.getElementById('score-num');
-    el.textContent = overall + '%';
-    el.style.color = overall >= 80 ? 'var(--green)' : overall >= 50 ? 'var(--yellow)' : 'var(--red)';
-    const badges = document.getElementById('score-badges');
-    badges.innerHTML = '';
-    if (filled >= 6) addBadge(badges, '💧 Hydration OK', 'info');
-    if (done >= Math.round(checks.length * 0.8)) addBadge(badges, '🥗 Diet on Track', 'info');
-    if (medChecks[0]?.checked && medChecks[1]?.checked) addBadge(badges, '💊 Meds Logged', 'info');
-  }
+<!-- ═══ SECTION 7: Coach's Note ═══ -->
+<div class="section">
+  <div class="section-title">💡 Coach's Note</div>
+  <div class="card">
+    <div style="font-size:.92rem;line-height:1.75;color:var(--text);">
+      Wednesday is giving you the best recovery signal in 30 days — 94%, HRV 98ms, resting HR 44 bpm — and that didn't happen by accident. Monday's 9.3 hours of sleep and a cleaner Tuesday evening drove this. The contrast is stark: Tuesday's Guinness + pizza combination sent sodium to 3,645mg and saturated fat to 42g, and yet your body still bounced back. That resilience is real. Now imagine what happens when you stack three or four clean days in a row.
+      <br/><br/>
+      The weight loss number (1 lb from 194) doesn't capture the full story. Managing your weight with panhypopituitarism, adrenal insufficiency, and hypothyroidism simultaneously is genuinely one of the hardest metabolic environments to lose weight in — the hormones that regulate metabolism, hunger, and body composition are all impaired and being replaced exogenously. The goal right now is consistency in logging, hitting protein, and protecting sleep. The scale will follow. Use today's 94% recovery to crush Routine B and keep the streak going.
+    </div>
+  </div>
+</div>
 
-  function addBadge(parent, text, type) {
-    const s = document.createElement('span');
-    s.className = 'pill ' + type;
-    s.textContent = text;
-    parent.appendChild(s);
-  }
-</script>
+<!-- ═══ ACTIVE MEDICATIONS (quick reference) ═══ -->
+<div class="section">
+  <div class="section-title">💊 Active Medications (Quick Reference)</div>
+  <div class="card">
+    <div class="g2">
+      <div>
+        <div class="exercise-row"><span>Humatrope 6mg (HGH)</span><span class="sets blue">Daily injection</span></div>
+        <div class="exercise-row"><span>Xyosted 50mg/0.5mL (Testosterone)</span><span class="sets blue">Weekly injection</span></div>
+        <div class="exercise-row"><span>Levothyroxine 150mcg</span><span class="sets blue">Daily oral — take fasting</span></div>
+      </div>
+      <div>
+        <div class="exercise-row"><span>Hydrocortisone 5mg × 5 tabs (25mg)</span><span class="sets blue">Daily — with food</span></div>
+        <div class="exercise-row"><span>Desmopressin 0.01% nasal spray</span><span class="sets blue">Daily — 1 spray</span></div>
+        <div class="exercise-row"><span>Solu-CORTEF 100mg</span><span class="sets amber">Emergency kit (PRN)</span></div>
+      </div>
+    </div>
+    <div class="callout red" style="margin-top:12px;">
+      <strong>⚠️ Sick-Day Rule</strong>
+      If you are unwell, vomiting, or under significant physical stress today: double your hydrocortisone dose immediately and contact your endocrinologist. Do not wait.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Footer ═══ -->
+<div style="text-align:center;padding:20px 0 0;font-size:.72rem;color:var(--muted);">
+  Daily Health Coaching Briefing · Raghav Chadha · June 25, 2026 · Data: WHOOP MCP + Lose It! Gmail + HealthEx
+</div>
+
+</div><!-- /wrap -->
 </body>
 </html>
