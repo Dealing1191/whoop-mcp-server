@@ -23,6 +23,7 @@ Built using the [Whoop Developer API v2](https://developer.whoop.com/docs/introd
 | `get_strain_history` | Training load and calorie trends |
 | `sync_data` | Manually trigger a data sync |
 | `get_auth_url` | Get authorization URL for Whoop connection |
+| `send_email` | Send an HTML email (e.g. a daily briefing) to a fixed, pre-configured recipient via Brevo |
 
 ## Setup
 
@@ -89,6 +90,23 @@ npm run dev
 | `DB_PATH` | SQLite database path | `./whoop.db` |
 | `PORT` | HTTP server port | `3000` |
 | `MCP_MODE` | `http` for remote, `stdio` for local | `http` |
+| `BREVO_API_KEY` | Brevo transactional email API key | Required for `send_email` |
+| `BREVO_SENDER_EMAIL` | Verified Brevo sender address | Required for `send_email` |
+| `BREVO_SENDER_NAME` | Sender display name | `Health Briefing` |
+| `BRIEFING_RECIPIENT_EMAIL` | Fixed recipient address for `send_email` | Required for `send_email` |
+| `BRIEFING_RECIPIENT_NAME` | Recipient display name | (none) |
+
+### Sending email (`send_email`)
+
+The Brevo API requires a custom `api-key` header, which client-side web-fetch
+tools (including the one available in Claude Routines) cannot attach — calling
+Brevo directly from a routine returns `403 Forbidden` with the key silently
+dropped. `send_email` moves that authenticated call server-side: it always
+sends to the single recipient configured via `BRIEFING_RECIPIENT_EMAIL` (the
+caller only supplies `subject` and `htmlContent`), so the endpoint can't be
+used as an open relay to arbitrary addresses. Set `BREVO_API_KEY` as a Railway
+environment variable — never put it in routine/prompt text, since that text
+isn't a secrets store.
 
 ## Architecture
 
