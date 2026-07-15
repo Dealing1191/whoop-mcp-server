@@ -361,22 +361,34 @@ function createMcpServer(): Server {
 
 					if (textContent) payload.text = textContent;
 
-					const res = await fetch('https://api.resend.com/emails', {
-						method: 'POST',
-						headers: {
-							Authorization: `Bearer ${config.resendApiKey}`,
-							'Content-Type': 'application/json',
-						},
-						body: JSON.stringify(payload),
-					});
+					try {
+						const fetchRes = await fetch('https://api.resend.com/emails', {
+							method: 'POST',
+							headers: {
+								Authorization: `Bearer ${config.resendApiKey}`,
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify(payload),
+						});
 
-					if (!res.ok) {
-						const errorBody = await res.text();
-						return { content: [{ type: 'text', text: `Email delivery failed (${res.status}): ${errorBody}` }], isError: true };
+						if (!fetchRes.ok) {
+							const errorBody = await fetchRes.text();
+							return { content: [{ type: 'text', text: `Email delivery failed (${fetchRes.status}): ${errorBody}` }], isError: true };
+						}
+
+						let result: { id?: string };
+						try {
+							result = await fetchRes.json();
+						} catch (parseError) {
+							const parseMsg = parseError instanceof Error ? parseError.message : 'JSON parse error';
+							return { content: [{ type: 'text', text: `Email response invalid: ${parseMsg}` }], isError: true };
+						}
+
+						return { content: [{ type: 'text', text: `Email sent successfully. Message ID: ${result.id ?? 'unknown'}` }] };
+					} catch (fetchError) {
+						const fetchMsg = fetchError instanceof Error ? fetchError.message : 'Network error';
+						return { content: [{ type: 'text', text: `Email send failed: ${fetchMsg}` }], isError: true };
 					}
-
-					const result = await res.json() as { id?: string };
-					return { content: [{ type: 'text', text: `Email sent successfully. Message ID: ${result.id ?? 'unknown'}` }] };
 				}
 
 				default:
