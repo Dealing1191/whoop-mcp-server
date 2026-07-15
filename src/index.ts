@@ -22,11 +22,10 @@ const config = {
 	dbPath: process.env.DB_PATH ?? './whoop.db',
 	port: Number.parseInt(process.env.PORT ?? '3000', 10),
 	mode: process.env.MCP_MODE ?? 'http',
-	brevoApiKey: process.env.BREVO_API_KEY ?? '',
-	senderEmail: process.env.BREVO_SENDER_EMAIL ?? '',
-	senderName: process.env.BREVO_SENDER_NAME ?? 'Health Briefing',
-	recipientEmail: process.env.BRIEFING_RECIPIENT_EMAIL ?? '',
-	recipientName: process.env.BRIEFING_RECIPIENT_NAME ?? '',
+	resendApiKey: process.env.RESEND_API_KEY ?? '',
+	emailFrom: process.env.EMAIL_FROM ?? 'onboarding@resend.dev',
+	emailFromName: process.env.EMAIL_FROM_NAME ?? "RC's Daily Health Briefing",
+	emailTo: process.env.EMAIL_TO ?? 'raghavchadha@gmail.com',
 };
 
 const db = new WhoopDatabase(config.dbPath);
@@ -100,33 +99,6 @@ function validateBoolean(value: unknown): boolean {
 	return false;
 }
 
-interface SendEmailResult {
-	ok: boolean;
-	status: number;
-	body: string;
-}
-
-async function sendBrevoEmail(subject: string, htmlContent: string, textContent?: string): Promise<SendEmailResult> {
-	const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-		method: 'POST',
-		headers: {
-			'api-key': config.brevoApiKey,
-			'Content-Type': 'application/json',
-			Accept: 'application/json',
-		},
-		body: JSON.stringify({
-			sender: { name: config.senderName, email: config.senderEmail },
-			to: [{ email: config.recipientEmail, name: config.recipientName || undefined }],
-			subject,
-			htmlContent,
-			...(textContent ? { textContent } : {}),
-		}),
-	});
-
-	const body = await response.text();
-	return { ok: response.ok, status: response.status, body };
-}
-
 function createMcpServer(): Server {
 	const server = new Server(
 		{ name: 'whoop-mcp-server', version: '1.0.0' },
@@ -183,7 +155,7 @@ function createMcpServer(): Server {
 			},
 			{
 				name: 'send_email',
-				description: 'Send an HTML email (e.g. a daily briefing) to the configured recipient via Brevo.',
+				description: 'Send an HTML email (e.g. a daily briefing) to the configured recipient via Resend.',
 				inputSchema: {
 					type: 'object',
 					properties: {
@@ -358,33 +330,6 @@ function createMcpServer(): Server {
 					};
 				}
 
-				case 'send_email': {
-					if (!config.brevoApiKey || !config.senderEmail || !config.recipientEmail) {
-						return {
-							content: [{
-								type: 'text',
-								text: 'Email is not configured. Set BREVO_API_KEY, BREVO_SENDER_EMAIL, and BRIEFING_RECIPIENT_EMAIL on the server.',
-							}],
-							isError: true,
-						};
-					}
-
-					if (!typedArgs.subject || !typedArgs.htmlContent) {
-						throw new McpError(ErrorCode.InvalidParams, 'subject and htmlContent are required');
-					}
-
-					const result = await sendBrevoEmail(typedArgs.subject, typedArgs.htmlContent, typedArgs.textContent);
-
-					if (!result.ok) {
-						return {
-							content: [{ type: 'text', text: `Brevo request failed (${result.status}): ${result.body}` }],
-							isError: true,
-						};
-					}
-
-					return { content: [{ type: 'text', text: `Email sent to ${config.recipientEmail}. ${result.body}` }] };
-				}
-
 				case 'get_auth_url': {
 					const scopes = ['read:profile', 'read:body_measurement', 'read:cycles', 'read:recovery', 'read:sleep', 'read:workout', 'offline'];
 					const url = client.getAuthorizationUrl(scopes);
@@ -394,6 +339,44 @@ function createMcpServer(): Server {
 							text: `To authorize with Whoop:\n\n1. Visit: ${url}\n2. Log in and authorize\n3. You'll be redirected back automatically\n\nRedirect URI: ${config.redirectUri}`,
 						}],
 					};
+				}
+
+				case 'send_email': {
+					const { subject, htmlContent, textContent } = typedArgs;
+
+					if (!subject || !htmlContent) {
+						return { content: [{ type: 'text', text: 'Error: subject and htmlContent are required.' }], isError: true };
+					}
+
+					if (!config.resendApiKey) {
+						return { content: [{ type: 'text', text: 'Error: RESEND_API_KEY environment variable not set.' }], isError: true };
+					}
+
+					const payload: Record<string, unknown> = {
+						from: `${config.emailFromName} <${config.emailFrom}>`,
+						to: [config.emailTo],
+						subject,
+						html: htmlContent,
+					};
+
+					if (textContent) payload.text = textContent;
+
+					const res = await fetch('https://api.resend.com/emails', {
+						method: 'POST',
+						headers: {
+							Authorization: `Bearer ${config.resendApiKey}`,
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify(payload),
+					});
+
+					if (!res.ok) {
+						const errorBody = await res.text();
+						return { content: [{ type: 'text', text: `Email delivery failed (${res.status}): ${errorBody}` }], isError: true };
+					}
+
+					const result = await res.json() as { id?: string };
+					return { content: [{ type: 'text', text: `Email sent successfully. Message ID: ${result.id ?? 'unknown'}` }] };
 				}
 
 				default:
