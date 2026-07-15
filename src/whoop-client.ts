@@ -72,7 +72,13 @@ export class WhoopClient {
 			throw new Error(`Token exchange failed: ${await response.text()}`);
 		}
 
-		const data = await response.json() as { access_token: string; refresh_token: string; expires_in: number };
+		let data: { access_token: string; refresh_token: string; expires_in: number };
+		try {
+			data = await response.json();
+		} catch (error) {
+			throw new Error(`Token exchange response invalid: ${error instanceof Error ? error.message : 'JSON parse error'}`);
+		}
+
 		const tokens: WhoopTokens = {
 			access_token: data.access_token,
 			refresh_token: data.refresh_token,
@@ -103,7 +109,13 @@ export class WhoopClient {
 			throw new Error(`Token refresh failed: ${await response.text()}`);
 		}
 
-		const data = await response.json() as { access_token: string; refresh_token: string; expires_in: number };
+		let data: { access_token: string; refresh_token: string; expires_in: number };
+		try {
+			data = await response.json();
+		} catch (error) {
+			throw new Error(`Token refresh response invalid: ${error instanceof Error ? error.message : 'JSON parse error'}`);
+		}
+
 		this.tokens = {
 			access_token: data.access_token,
 			refresh_token: data.refresh_token,
@@ -137,7 +149,11 @@ export class WhoopClient {
 			throw new Error(`API request failed: ${response.status} ${await response.text()}`);
 		}
 
-		return response.json() as Promise<T>;
+		try {
+			return await response.json() as T;
+		} catch (error) {
+			throw new Error(`API response invalid: ${error instanceof Error ? error.message : 'JSON parse error'}`);
+		}
 	}
 
 	async getProfile(): Promise<WhoopUser> {
