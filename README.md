@@ -23,7 +23,7 @@ Built using the [Whoop Developer API v2](https://developer.whoop.com/docs/introd
 | `get_strain_history` | Training load and calorie trends |
 | `sync_data` | Manually trigger a data sync |
 | `get_auth_url` | Get authorization URL for Whoop connection |
-| `send_email` | Send an HTML email (e.g. a daily briefing) to a fixed, pre-configured recipient via Resend |
+| `send_to_notion` | Create a new sub-page in Notion (e.g. a daily briefing) under a parent page |
 
 ## Setup
 
@@ -34,12 +34,16 @@ Built using the [Whoop Developer API v2](https://developer.whoop.com/docs/introd
 3. Note your **Client ID** and **Client Secret**
 4. Set the redirect URI to your deployed server's callback URL (e.g., `https://your-app.railway.app/callback`)
 
-### 2. Set up Email Delivery (Resend)
+### 2. Set up Notion Integration
 
-1. Go to [Resend.com](https://resend.com) and create an account
-2. Create an API key in the dashboard
-3. Verify the sender domain/email address you'll use
-4. Note your API key and sender email
+1. Go to [Notion Integrations](https://www.notion.so/my-integrations)
+2. Click "Create new integration"
+3. Give it a name (e.g., "Whoop Health Briefings")
+4. Select "Internal Integration"
+5. Copy the **API Key** (this is your `NOTION_API_KEY`)
+6. Go to your Daily-Health-Briefings Notion page
+7. Click the "..." menu → "Add connections" → Add your integration
+8. Copy the page ID from the URL (the long alphanumeric string after `/p/`)
 
 ### 3. Deploy to Railway
 
@@ -50,10 +54,8 @@ Built using the [Whoop Developer API v2](https://developer.whoop.com/docs/introd
    - `WHOOP_CLIENT_ID`: Your Whoop app client ID
    - `WHOOP_CLIENT_SECRET`: Your Whoop app client secret
    - `WHOOP_REDIRECT_URI`: `https://your-app.railway.app/callback`
-   - `RESEND_API_KEY`: Your Resend API key
-   - `EMAIL_FROM`: Your verified Resend sender email
-   - `EMAIL_FROM_NAME`: Display name for sender
-   - `EMAIL_TO`: Email address to send briefings to
+   - `NOTION_API_KEY`: Your Notion integration API key
+   - `NOTION_PAGE_ID`: Page ID of your Daily-Health-Briefings page
 5. Add a volume mounted at `/data` for persistent SQLite storage
 6. Deploy!
 
@@ -85,10 +87,8 @@ WHOOP_CLIENT_ID=your_client_id
 WHOOP_CLIENT_SECRET=your_client_secret
 WHOOP_REDIRECT_URI=http://localhost:3000/callback
 MCP_MODE=http
-RESEND_API_KEY=your_resend_api_key
-EMAIL_FROM=noreply@yourdomain.com
-EMAIL_FROM_NAME=Daily Health Briefing
-EMAIL_TO=your-email@example.com
+NOTION_API_KEY=your_notion_api_key
+NOTION_PAGE_ID=your_notion_page_id
 EOF
 
 # Run in development mode
@@ -105,19 +105,17 @@ npm run dev
 | `DB_PATH` | SQLite database path | `./whoop.db` |
 | `PORT` | HTTP server port | `3000` |
 | `MCP_MODE` | `http` for remote, `stdio` for local | `http` |
-| `RESEND_API_KEY` | Resend API key for sending emails | Required for `send_email` |
-| `EMAIL_FROM` | Email address to send from (must be verified in Resend) | `onboarding@resend.dev` |
-| `EMAIL_FROM_NAME` | Sender display name | `RC's Daily Health Briefing` |
-| `EMAIL_TO` | Fixed recipient email address for `send_email` | `raghavchadha@gmail.com` |
+| `NOTION_API_KEY` | Notion API key for creating pages | Required for `send_to_notion` |
+| `NOTION_PAGE_ID` | Parent page ID in Notion (Daily-Health-Briefings) | Required for `send_to_notion` |
 
-### Sending email (`send_email`)
+### Creating Notion pages (`send_to_notion`)
 
-The Resend API requires authentication via Bearer token, which client-side web-fetch
+The Notion API requires authentication via Bearer token, which client-side web-fetch
 tools (including the one available in Claude Routines) cannot reliably attach.
-`send_email` moves that authenticated call server-side: it always sends to the single
-recipient configured via `EMAIL_TO` (the caller only supplies `subject` and
-`htmlContent`), so the endpoint can't be used as an open relay to arbitrary addresses.
-Set `RESEND_API_KEY` as a Railway environment variable — never put it in routine/prompt
+`send_to_notion` moves that authenticated call server-side: it always creates sub-pages
+under the parent page configured via `NOTION_PAGE_ID` (the caller only supplies `title`
+and `htmlContent`), so the endpoint can't be used to create pages in arbitrary workspaces.
+Set `NOTION_API_KEY` as a Railway environment variable — never put it in routine/prompt
 text, since that text isn't a secrets store.
 
 ## Architecture

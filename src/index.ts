@@ -22,10 +22,8 @@ const config = {
 	dbPath: process.env.DB_PATH ?? './whoop.db',
 	port: Number.parseInt(process.env.PORT ?? '3000', 10),
 	mode: process.env.MCP_MODE ?? 'http',
-	resendApiKey: process.env.RESEND_API_KEY ?? '',
-	emailFrom: process.env.EMAIL_FROM ?? 'onboarding@resend.dev',
-	emailFromName: process.env.EMAIL_FROM_NAME ?? "RC's Daily Health Briefing",
-	emailTo: process.env.EMAIL_TO ?? 'raghavchadha@gmail.com',
+	notionApiKey: process.env.NOTION_API_KEY ?? '',
+	notionPageId: process.env.NOTION_PAGE_ID ?? '',
 };
 
 const db = new WhoopDatabase(config.dbPath);
@@ -154,16 +152,15 @@ function createMcpServer(): Server {
 				inputSchema: { type: 'object', properties: {}, required: [] },
 			},
 			{
-				name: 'send_email',
-				description: 'Send an HTML email (e.g. a daily briefing) to the configured recipient via Resend.',
+				name: 'send_to_notion',
+				description: 'Create a new sub-page in Notion (e.g. a daily briefing) under the Daily-Health-Briefings parent page.',
 				inputSchema: {
 					type: 'object',
 					properties: {
-						subject: { type: 'string', description: 'Email subject line' },
-						htmlContent: { type: 'string', description: 'Full HTML body of the email' },
-						textContent: { type: 'string', description: 'Optional plain-text fallback body' },
+						title: { type: 'string', description: 'Page title (e.g., "Daily Briefing - Jan 15, 2025")' },
+						htmlContent: { type: 'string', description: 'HTML content to convert and save in Notion' },
 					},
-					required: ['subject', 'htmlContent'],
+					required: ['title', 'htmlContent'],
 				},
 			},
 		],
@@ -341,53 +338,67 @@ function createMcpServer(): Server {
 					};
 				}
 
-				case 'send_email': {
-					const { subject, htmlContent, textContent } = typedArgs;
+				case 'send_to_notion': {
+					const { title, htmlContent } = typedArgs;
 
-					if (!subject || !htmlContent) {
-						return { content: [{ type: 'text', text: 'Error: subject and htmlContent are required.' }], isError: true };
+					if (!title || !htmlContent) {
+						return { content: [{ type: 'text', text: 'Error: title and htmlContent are required.' }], isError: true };
 					}
 
-					if (!config.resendApiKey) {
-						return { content: [{ type: 'text', text: 'Error: RESEND_API_KEY environment variable not set.' }], isError: true };
+					if (!config.notionApiKey) {
+						return { content: [{ type: 'text', text: 'Error: NOTION_API_KEY environment variable not set.' }], isError: true };
 					}
 
-					const payload: Record<string, unknown> = {
-						from: `${config.emailFromName} <${config.emailFrom}>`,
-						to: [config.emailTo],
-						subject,
-						html: htmlContent,
-					};
-
-					if (textContent) payload.text = textContent;
+					if (!config.notionPageId) {
+						return { content: [{ type: 'text', text: 'Error: NOTION_PAGE_ID environment variable not set.' }], isError: true };
+					}
 
 					try {
-						const fetchRes = await fetch('https://api.resend.com/emails', {
+						const payload = {
+							parent: { page_id: config.notionPageId },
+							properties: {
+								title: {
+									title: [{ type: 'text', text: title }],
+								},
+							},
+							children: [
+								{
+									object: 'block',
+									type: 'paragraph',
+									paragraph: {
+										rich_text: [{ type: 'text', text: htmlContent }],
+									},
+								},
+							],
+						};
+
+						const notionRes = await fetch('https://api.notion.com/v1/pages', {
 							method: 'POST',
 							headers: {
-								Authorization: `Bearer ${config.resendApiKey}`,
+								Authorization: `Bearer ${config.notionApiKey}`,
+								'Notion-Version': '2022-06-28',
 								'Content-Type': 'application/json',
 							},
 							body: JSON.stringify(payload),
 						});
 
-						if (!fetchRes.ok) {
-							const errorBody = await fetchRes.text();
-							return { content: [{ type: 'text', text: `Email delivery failed (${fetchRes.status}): ${errorBody}` }], isError: true };
+						if (!notionRes.ok) {
+							const errorBody = await notionRes.text();
+							return { content: [{ type: 'text', text: `Notion page creation failed (${notionRes.status}): ${errorBody}` }], isError: true };
 						}
 
 						let result: { id?: string };
 						try {
-							result = await fetchRes.json();
+							result = await notionRes.json();
 						} catch (parseError) {
 							const parseMsg = parseError instanceof Error ? parseError.message : 'JSON parse error';
-							return { content: [{ type: 'text', text: `Email response invalid: ${parseMsg}` }], isError: true };
+							return { content: [{ type: 'text', text: `Notion response invalid: ${parseMsg}` }], isError: true };
 						}
 
-						return { content: [{ type: 'text', text: `Email sent successfully. Message ID: ${result.id ?? 'unknown'}` }] };
+						return { content: [{ type: 'text', text: `Notion page created successfully. Page ID: ${result.id ?? 'unknown'}` }] };
 					} catch (fetchError) {
 						const fetchMsg = fetchError instanceof Error ? fetchError.message : 'Network error';
-						return { content: [{ type: 'text', text: `Email send failed: ${fetchMsg}` }], isError: true };
+						return { content: [{ type: 'text', text: `Notion page creation failed: ${fetchMsg}` }], isError: true };
 					}
 				}
 
