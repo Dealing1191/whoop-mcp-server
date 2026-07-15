@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Daily Health Coaching Briefing — June 24, 2026</title>
+<style>
+:root{
+  --bg:#0e1117;--surface:#161b27;--card:#1c2333;--border:#2a3347;
+  --green:#22c55e;--green-dim:rgba(34,197,94,.12);
+  --amber:#f59e0b;--amber-dim:rgba(245,158,11,.1);
+  --red:#ef4444;--red-dim:rgba(239,68,68,.1);
+  --blue:#4f8ef7;--blue-dim:rgba(79,142,247,.1);
+  --purple:#7c5cf4;
+  --text:#e2e8f0;--muted:#64748b;--subtle:#94a3b8;
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;}
+
+/* ── Header bar ── */
+.hdr{background:linear-gradient(135deg,#1a2540 0%,#111827 100%);border-bottom:1px solid var(--border);padding:20px 28px 18px;}
+.hdr-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;}
+.hdr h1{font-size:1.25rem;font-weight:700;letter-spacing:-.01em;}
+.hdr h1 span{background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hdr .meta{font-size:.78rem;color:var(--muted);margin-top:4px;}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.badge{padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:600;letter-spacing:.02em;}
+.badge.green{background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,.25);}
+.badge.amber{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,158,11,.25);}
+.badge.blue{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(79,142,247,.25);}
+
+/* ── Layout ── */
+.wrap{max-width:960px;margin:0 auto;padding:22px 18px 60px;}
+.section{margin-bottom:22px;}
+.section-title{font-size:.68rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;}
+.card+.card{margin-top:12px;}
+.card-title{font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.card-title .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dot-green{background:var(--green);}
+.dot-amber{background:var(--amber);}
+.dot-red{background:var(--red);}
+.dot-blue{background:var(--blue);}
+
+/* ── Grid ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:680px){.g2,.g3,.g4{grid-template-columns:1fr 1fr;}}
+@media(max-width:420px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+
+/* ── Stat cells ── */
+.stat{padding:12px 10px;text-align:center;}
+.stat .v{font-size:1.7rem;font-weight:800;line-height:1;}
+.stat .u{font-size:.68rem;color:var(--muted);margin-top:2px;}
+.stat .l{font-size:.7rem;color:var(--subtle);margin-top:5px;}
+.green{color:var(--green);}
+.amber{color:var(--amber);}
+.red{color:var(--red);}
+.blue{color:var(--blue);}
+.purple{color:var(--purple);}
+
+/* ── Metrics table ── */
+.tbl{width:100%;border-collapse:collapse;font-size:.82rem;}
+.tbl th{text-align:left;padding:7px 10px;font-size:.68rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
+.tbl td{padding:8px 10px;border-bottom:1px solid rgba(42,51,71,.5);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl td:not(:first-child){text-align:right;}
+.tbl .row-hl td{background:rgba(79,142,247,.05);}
+.chip{display:inline-block;padding:2px 8px;border-radius:5px;font-size:.68rem;font-weight:600;}
+.chip.g{background:var(--green-dim);color:var(--green);}
+.chip.a{background:var(--amber-dim);color:var(--amber);}
+.chip.r{background:var(--red-dim);color:var(--red);}
+
+/* ── Bullet lists ── */
+.bullets{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.bullets li{display:flex;gap:10px;font-size:.83rem;line-height:1.5;}
+.bullets li::before{content:'';display:block;width:6px;height:6px;border-radius:50%;margin-top:7px;flex-shrink:0;}
+.bullets.good li::before{background:var(--green);}
+.bullets.warn li::before{background:var(--amber);}
+.bullets.bad li::before{background:var(--red);}
+.bullets.info li::before{background:var(--blue);}
+
+/* ── Progress bars ── */
+.pb-row{margin-bottom:11px;}
+.pb-hdr{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:5px;}
+.pb-hdr .lbl{}
+.pb-hdr .val{color:var(--muted);}
+.pb-bg{height:8px;background:#1e2a3a;border-radius:99px;overflow:hidden;}
+.pb-fill{height:100%;border-radius:99px;transition:width .8s ease;}
+.pb-green{background:var(--green);}
+.pb-amber{background:var(--amber);}
+.pb-red{background:var(--red);}
+.pb-blue{background:linear-gradient(90deg,var(--blue),var(--purple));}
+
+/* ── Callout boxes ── */
+.callout{border-radius:8px;padding:12px 15px;font-size:.82rem;line-height:1.6;margin-top:10px;}
+.callout.green{background:var(--green-dim);border:1px solid rgba(34,197,94,.2);}
+.callout.amber{background:var(--amber-dim);border:1px solid rgba(245,158,11,.2);}
+.callout.red{background:var(--red-dim);border:1px solid rgba(239,68,68,.2);}
+.callout.blue{background:var(--blue-dim);border:1px solid rgba(79,142,247,.2);}
+.callout strong{display:block;margin-bottom:4px;}
+
+/* ── Number list ── */
+.num-list{counter-reset:nl;display:flex;flex-direction:column;gap:10px;}
+.num-list li{counter-increment:nl;display:flex;gap:12px;font-size:.83rem;line-height:1.5;}
+.num-list li::before{content:counter(nl);display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--blue-dim);color:var(--blue);font-size:.72rem;font-weight:700;flex-shrink:0;margin-top:1px;}
+
+/* ── Workout cards ── */
+.workout-day{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;font-size:.82rem;margin-bottom:4px;}
+.workout-day.today{background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.25);}
+.workout-day .wd-label{width:90px;flex-shrink:0;font-weight:600;font-size:.75rem;}
+.workout-day .wd-type{flex:1;}
+.wd-arrow{color:var(--blue);font-weight:700;margin-right:4px;}
+
+.exercise-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(42,51,71,.5);font-size:.82rem;}
+.exercise-row:last-child{border-bottom:none;}
+.exercise-row .sets{color:var(--blue);font-weight:600;white-space:nowrap;}
+
+/* ── Food log ── */
+.food-row{display:flex;justify-content:space-between;padding:5px 0;font-size:.8rem;border-bottom:1px solid rgba(42,51,71,.4);}
+.food-row:last-child{border-bottom:none;}
+.food-row .kcal{color:var(--muted);}
+.meal-head{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:10px 0 4px;}
+
+/* ── Weight ring ── */
+.weight-ring-wrap{display:flex;align-items:center;gap:20px;}
+.wring-info .wval{font-size:2rem;font-weight:800;}
+.wring-info .wlbl{font-size:.75rem;color:var(--muted);margin-top:2px;}
+
+/* ── Animate ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.card{animation:fadeUp .3s ease both;}
+.section:nth-child(1) .card{animation-delay:.05s;}
+.section:nth-child(2) .card{animation-delay:.1s;}
+.section:nth-child(3) .card{animation-delay:.15s;}
+.section:nth-child(4) .card{animation-delay:.2s;}
+.section:nth-child(5) .card{animation-delay:.25s;}
+.section:nth-child(6) .card{animation-delay:.3s;}
+.section:nth-child(7) .card{animation-delay:.35s;}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="hdr">
+  <div class="hdr-inner">
+    <div>
+      <h1>🏋️ Daily <span>Health Coaching Briefing</span></h1>
+      <div class="meta">Covering Tuesday, June 24, 2026 · Raghav Chadha · Generated Jun 25 at 8:05 AM</div>
+    </div>
+    <div class="badge-row">
+      <span class="badge green">Recovery 94% 🟢</span>
+      <span class="badge amber">Sleep 6.3h ⚠️</span>
+      <span class="badge amber">Protein 103g ⚠️</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ═══ SECTION 1: What's Working Well ═══ -->
+<div class="section">
+  <div class="section-title">✓ What's Working Well</div>
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span>Key Metrics — Yesterday vs. Trends</div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Yesterday (Jun 24)</th>
+          <th>7-Day Avg</th>
+          <th>30-Day Avg</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Recovery %</td>
+          <td><strong class="green">94%</strong></td>
+          <td>64%</td>
+          <td>67%</td>
+          <td><span class="chip g">↑ Best of Month</span></td>
+        </tr>
+        <tr>
+          <td>HRV (ms)</td>
+          <td><strong class="green">98.0 ms</strong></td>
+          <td>69.4 ms</td>
+          <td>66.3 ms</td>
+          <td><span class="chip g">↑ +41% above avg</span></td>
+        </tr>
+        <tr>
+          <td>Resting HR (bpm)</td>
+          <td><strong class="green">44 bpm</strong></td>
+          <td>51 bpm</td>
+          <td>51 bpm</td>
+          <td><span class="chip g">↓ Excellent</span></td>
+        </tr>
+        <tr>
+          <td>Sleep Duration (h)</td>
+          <td><span class="amber">6.3h</span></td>
+          <td>6.6h</td>
+          <td>6.4h</td>
+          <td><span class="chip a">⚠️ Below 7h target</span></td>
+        </tr>
+        <tr>
+          <td>Sleep Efficiency (%)</td>
+          <td><strong class="green">91%</strong></td>
+          <td>89%</td>
+          <td>90%</td>
+          <td><span class="chip g">✓ On track</span></td>
+        </tr>
+        <tr>
+          <td>Sleep Performance (%)</td>
+          <td><span class="amber">80%</span></td>
+          <td>72%</td>
+          <td>75%</td>
+          <td><span class="chip g">↑ Above average</span></td>
+        </tr>
+        <tr>
+          <td>Day Strain</td>
+          <td>4.5</td>
+          <td>5.9</td>
+          <td>6.9</td>
+          <td><span class="chip a">Light day</span></td>
+        </tr>
+        <tr>
+          <td>WHOOP Calories (kcal)</td>
+          <td>1,845 kcal</td>
+          <td>1,969 kcal</td>
+          <td>2,016 kcal</td>
+          <td><span class="chip a">Below avg burn</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:16px;">
+      <ul class="bullets good">
+        <li><strong>Recovery 94% — best day in 30 days.</strong> HRV hit 98.0 ms, 41% above your 7-day average of 69.4 ms, signalling excellent parasympathetic tone after Monday's 9.3h sleep.</li>
+        <li><strong>Resting HR at 44 bpm</strong> — 7 bpm below your 7-day average. Combined with high HRV, this is your body in peak readiness. A strong signal to train hard today.</li>
+        <li><strong>Sleep efficiency 91%</strong> — time in bed is being used well. The quality is there; the duration just needs extending.</li>
+        <li><strong>Steps at 8,493 on Tuesday</strong> — solid non-exercise activity for a rest/cardio day.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 2: Nutrition ═══ -->
+<div class="section">
+  <div class="section-title">📋 Nutrition</div>
+  <div class="g2">
+    <!-- Calories + Macros -->
+    <div class="card">
+      <div class="card-title"><span class="dot dot-amber"></span>Lose It! — Tuesday Jun 23 <span style="font-size:.65rem;color:var(--muted);margin-left:4px;">(most recent; Jun 24 email arrives ~noon)</span></div>
+
+      <div class="g4" style="margin-bottom:16px;">
+        <div class="stat">
+          <div class="v amber">2,287</div>
+          <div class="u">kcal consumed</div>
+          <div class="l">Budget: 2,117</div>
+        </div>
+        <div class="stat">
+          <div class="v red">+170</div>
+          <div class="u">over budget</div>
+          <div class="l">Net: 2,287</div>
+        </div>
+        <div class="stat">
+          <div class="v" style="color:#a78bfa">1,845</div>
+          <div class="u">WHOOP burned</div>
+          <div class="l">Jun 24</div>
+        </div>
+        <div class="stat">
+          <div class="v blue">8,493</div>
+          <div class="u">steps</div>
+          <div class="l">From Lose It!</div>
+        </div>
+      </div>
+
+      <div class="pb-row">
+        <div class="pb-hdr"><span class="lbl">Protein</span><span class="val">103g <span class="red">⚠️ vs 130g target</span></span></div>
+        <div class="pb-bg"><div class="pb-fill pb-amber" style="width:79%"></div></div>
+      </div>
+      <div class="pb-row">
+        <div class="pb-hdr"><span class="lbl">Carbohydrates</span><span class="val">189g</span></div>
+        <div class="pb-bg"><div class="pb-fill pb-blue" style="width:68%"></div></div>
+      </div>
+      <div class="pb-row">
+        <div class="pb-hdr"><span class="lbl">Fat (total)</span><span class="val">104g <span class="red">⚠️ 42g saturated</span></span></div>
+        <div class="pb-bg"><div class="pb-fill pb-red" style="width:80%"></div></div>
+      </div>
+      <div class="pb-row">
+        <div class="pb-hdr"><span class="lbl">Fiber</span><span class="val">13g <span class="amber">vs 30g target</span></span></div>
+        <div class="pb-bg"><div class="pb-fill pb-amber" style="width:43%"></div></div>
+      </div>
+      <div class="pb-row">
+        <div class="pb-hdr"><span class="lbl">Sodium</span><span class="val"><span class="red">3,645mg ⚠️ Very high</span></span></div>
+        <div class="pb-bg"><div class="pb-fill pb-red" style="width:100%"></div></div>
+      </div>
+    </div>
+
+    <!-- Food Log -->
+    <div class="card">
+      <div class="card-title"><span class="dot dot-amber"></span>Daily Food Log — Tue Jun 23</div>
+
+      <div class="meal-head">Lunch — 1,577 kcal</div>
+      <div class="food-row"><span>Pizza, 14" Sausage Thin Crust × 5 slices</span><span class="kcal">1,410</span></div>
+      <div class="food-row"><span>Beer, Guinness × 16 fl oz</span><span class="kcal red">167 ⚠️</span></div>
+
+      <div class="meal-head">Dinner — 622 kcal</div>
+      <div class="food-row"><span>Mutton/Goat Biryani × 0.67 serving</span><span class="kcal">434</span></div>
+      <div class="food-row"><span>Greek Yogurt, Vanilla × 193g</span><span class="kcal">114</span></div>
+      <div class="food-row"><span>Greek Yogurt, Plain Whole Milk × 75g</span><span class="kcal">75</span></div>
+
+      <div class="meal-head">Snacks — 87 kcal</div>
+      <div class="food-row"><span>Mozzarella Pearls × 8 pieces</span><span class="kcal">70</span></div>
+      <div class="food-row"><span>Tomatoes, Grape × 5</span><span class="kcal">7</span></div>
+      <div class="food-row"><span>Olives, Green × 2</span><span class="kcal">10</span></div>
+
+      <div class="callout amber" style="margin-top:12px;">
+        <strong>⚠️ Coaching note on lunch</strong>
+        5 slices of sausage pizza + a pint of Guinness delivered 42g saturated fat and 3,645mg sodium — both serious flags given NAFLD and cardiovascular history. Alcohol is a direct hepatotoxin at any amount with fatty liver disease.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 3: Areas Needing Attention ═══ -->
+<div class="section">
+  <div class="section-title">⚠️ Areas Needing Attention</div>
+  <div class="card">
+    <ul class="bullets warn">
+      <li><strong>Protein consistently below target.</strong> 103g consumed vs. 130–150g recommended for lean mass building with GHD and testosterone therapy. This pattern undermines the anabolic window created by your hormone replacement. Protein has been under target on most logged days.</li>
+      <li><strong>Sleep duration averaging 6.4h (30-day) vs. 7h+ target.</strong> 5 of the last 7 nights were under 7 hours. Chronic short sleep raises cortisol, suppresses GH pulse amplitude, and makes weight management harder — compounded by your panhypopituitarism. This is a top-priority lever.</li>
+      <li><strong>Saturated fat at 42g Tuesday</strong> — more than 2× the recommended limit for someone with NAFLD and hypercholesterolemia. Sausage pizza + mozzarella is a high-sat-fat combination that directly worsens liver fat accumulation.</li>
+      <li><strong>Sodium at 3,645mg — well above the 2,300mg general limit</strong>, and problematic given adrenal insufficiency management requires careful fluid/electrolyte balance with desmopressin. High sodium can cause paradoxical fluid retention on DDAVP.</li>
+      <li><strong>Alcohol (Guinness 16 fl oz) on a weekday.</strong> Alcohol is metabolised as a toxin by the liver, directly worsening NAFLD. It also disrupts hydrocortisone effectiveness and sleep architecture — your HRV dip Tuesday (70.7ms vs 98ms Wednesday) reflects this.</li>
+      <li><strong>Fiber at only 13g vs 30g target.</strong> Low fiber combined with high refined carbs (pizza dough) spikes postprandial glucose, problematic alongside diabetes and high cholesterol. Fiber deficiency also impacts bile acid clearance.</li>
+      <li><strong>Day strain tracking light (4.5 vs 6.9 30-day avg) on a scheduled cardio day.</strong> Tuesday should have been a cardio session — no exercise logged in Lose It! confirms this was likely missed.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══ SECTION 4: Top 3 Recommendations ═══ -->
+<div class="section">
+  <div class="section-title">🎯 Top 3 Actionable Recommendations — Next 24 Hours</div>
+  <div class="card">
+    <ol class="num-list">
+      <li>
+        <div>
+          <strong>Hit 130g+ protein today — log every meal.</strong> You're at 103g on the best-tracked days. Today is a Pull (strength) day — your muscles need amino acids to rebuild after the workout. Plan: protein shake post-workout (30g), eggs at breakfast (18g), chicken at lunch (50g), Greek yogurt snack (15g), fish or lean meat at dinner (40g). That's &gt;150g. Panhypopituitarism reduces muscle protein synthesis baseline — the margin for hitting protein targets is smaller than average.
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Eliminate alcohol completely and swap pizza for a Mediterranean-style lunch.</strong> Your 7-day HRV average dropped to 69.4ms — Tuesday's Guinness + pizza almost certainly contributed to the dip (70.7ms Tuesday vs 98ms after a clean Wednesday). With NAFLD confirmed, even one drink causes measurable liver enzyme elevation. Replace the pizza habit with salmon + quinoa or a chicken grain bowl — same calories, drastically better macro and fat profile.
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Add 45 minutes to your bedtime tonight and protect that window.</strong> You've averaged 6.4h over 30 days vs. a 7h target. Growth hormone (even with Humatrope) peaks during deep sleep — getting more sleep directly amplifies your HGH therapy. Set a hard lights-out alarm for 10:15 PM. No screens after 9:30 PM. Your recovery today is 94% — the body is ready. Don't waste it with short sleep tonight.
+        </div>
+      </li>
+    </ol>
+  </div>
+</div>
+
+<!-- ═══ SECTION 5: Weight Loss Progress ═══ -->
+<div class="section">
+  <div class="section-title">📊 Weight Loss Progress</div>
+  <div class="card">
+    <div class="g2" style="gap:20px; align-items:center;">
+      <div>
+        <table class="tbl">
+          <thead>
+            <tr><th>Milestone</th><th>Weight (lbs)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Starting Weight</td><td><strong>194 lbs</strong></td></tr>
+            <tr><td>10% Goal Weight</td><td><strong>175.5 lbs</strong> <span style="font-size:.7rem;color:var(--muted);">(Lose It! shows 171)</span></td></tr>
+            <tr class="row-hl"><td><strong>Current Weight (Jun 23)</strong></td><td><strong class="amber">193 lbs</strong></td></tr>
+            <tr><td>Lost So Far</td><td><strong class="green">1 lb</strong></td></tr>
+            <tr><td>Remaining to 10% Goal</td><td><span class="red">17.5 lbs</span></td></tr>
+            <tr><td>% of Goal Achieved</td><td><span class="amber">5.4%</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <!-- Donut ring -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+          <svg width="130" height="130" viewBox="0 0 130 130">
+            <circle cx="65" cy="65" r="52" fill="none" stroke="#1e2a3a" stroke-width="12"/>
+            <circle cx="65" cy="65" r="52" fill="none" stroke="#f59e0b" stroke-width="12"
+              stroke-dasharray="326.73" stroke-dashoffset="309"
+              stroke-linecap="round" transform="rotate(-90 65 65)"/>
+            <text x="65" y="60" text-anchor="middle" fill="#f59e0b" font-size="18" font-weight="800">5.4%</text>
+            <text x="65" y="77" text-anchor="middle" fill="#64748b" font-size="10">of goal</text>
+          </svg>
+          <div style="text-align:center;">
+            <div style="font-size:.78rem;color:var(--muted);">At 1 lb/week pace</div>
+            <div style="font-size:.85rem;font-weight:600;color:var(--amber);">~17–18 weeks to goal</div>
+          </div>
+        </div>
+        <div class="callout amber" style="margin-top:10px;">
+          <strong>Context</strong>
+          Slow progress (1 lb lost vs. starting weight) is expected with panhypopituitarism and multiple hormone deficiencies — weight management is genuinely harder. Keep logging consistently; even maintaining while building lean mass is progress.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 6: Today's Workout ═══ -->
+<div class="section">
+  <div class="section-title">🏋️ Today's Workout — Wednesday June 25</div>
+  <div class="g2">
+    <!-- Today's session -->
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>Routine B — Pull (Back, Biceps, Rear Delts)</div>
+      <div class="callout green" style="margin-bottom:14px;">
+        <strong>✅ Recovery 94% — Green Light. Train hard today.</strong>
+        HRV 98ms, RHR 44 bpm. This is your best readiness day in 30 days. Don't hold back.
+      </div>
+      <div class="exercise-row"><span>Pull-Ups or Lat Pulldown</span><span class="sets">4 × 8–10</span></div>
+      <div class="exercise-row"><span>Barbell or Cable Row</span><span class="sets">4 × 10</span></div>
+      <div class="exercise-row"><span>Single-Arm Dumbbell Row</span><span class="sets">3 × 10 (each side)</span></div>
+      <div class="exercise-row"><span>Face Pulls (cable)</span><span class="sets">3 × 15</span></div>
+      <div class="exercise-row"><span>Barbell or Dumbbell Curl</span><span class="sets">3 × 12</span></div>
+      <div class="exercise-row"><span>Hammer Curls</span><span class="sets">3 × 12</span></div>
+    </div>
+
+    <!-- Weekly schedule -->
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>This Week's Schedule</div>
+      <div class="workout-day"><span class="wd-label">Monday</span><span class="wd-type">💪 Strength — Routine A (Push)</span></div>
+      <div class="workout-day"><span class="wd-label">Tuesday</span><span class="wd-type">🏃 Cardio — Squash / Bike / Walk / Golf</span></div>
+      <div class="workout-day today"><span class="wd-label"><span class="wd-arrow">▶</span> Wednesday</span><span class="wd-type blue"><strong>💪 Strength — Routine B (Pull)</strong></span></div>
+      <div class="workout-day"><span class="wd-label">Thursday</span><span class="wd-type">🏃 Cardio — Squash / Bike / Walk / Golf</span></div>
+      <div class="workout-day"><span class="wd-label">Friday</span><span class="wd-type">💪 Strength — Routine C (Legs + Core)</span></div>
+      <div class="workout-day"><span class="wd-label">Saturday</span><span class="wd-type">🏃 Cardio — Squash / Bike / Walk / Golf</span></div>
+      <div class="workout-day"><span class="wd-label">Sunday</span><span class="wd-type">😴 Rest — Light activity or full rest</span></div>
+
+      <div class="callout blue" style="margin-top:14px;">
+        <strong>💡 Missed Tuesday Cardio</strong>
+        No exercise was logged in Lose It! on Tuesday and WHOOP strain was only 4.5. Consider making today's Pull session count double by adding a 15-min walk after the gym, and don't miss Thursday's cardio.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 7: Coach's Note ═══ -->
+<div class="section">
+  <div class="section-title">💡 Coach's Note</div>
+  <div class="card">
+    <div style="font-size:.92rem;line-height:1.75;color:var(--text);">
+      Wednesday is giving you the best recovery signal in 30 days — 94%, HRV 98ms, resting HR 44 bpm — and that didn't happen by accident. Monday's 9.3 hours of sleep and a cleaner Tuesday evening drove this. The contrast is stark: Tuesday's Guinness + pizza combination sent sodium to 3,645mg and saturated fat to 42g, and yet your body still bounced back. That resilience is real. Now imagine what happens when you stack three or four clean days in a row.
+      <br/><br/>
+      The weight loss number (1 lb from 194) doesn't capture the full story. Managing your weight with panhypopituitarism, adrenal insufficiency, and hypothyroidism simultaneously is genuinely one of the hardest metabolic environments to lose weight in — the hormones that regulate metabolism, hunger, and body composition are all impaired and being replaced exogenously. The goal right now is consistency in logging, hitting protein, and protecting sleep. The scale will follow. Use today's 94% recovery to crush Routine B and keep the streak going.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ACTIVE MEDICATIONS (quick reference) ═══ -->
+<div class="section">
+  <div class="section-title">💊 Active Medications (Quick Reference)</div>
+  <div class="card">
+    <div class="g2">
+      <div>
+        <div class="exercise-row"><span>Humatrope 6mg (HGH)</span><span class="sets blue">Daily injection</span></div>
+        <div class="exercise-row"><span>Xyosted 50mg/0.5mL (Testosterone)</span><span class="sets blue">Weekly injection</span></div>
+        <div class="exercise-row"><span>Levothyroxine 150mcg</span><span class="sets blue">Daily oral — take fasting</span></div>
+      </div>
+      <div>
+        <div class="exercise-row"><span>Hydrocortisone 5mg × 5 tabs (25mg)</span><span class="sets blue">Daily — with food</span></div>
+        <div class="exercise-row"><span>Desmopressin 0.01% nasal spray</span><span class="sets blue">Daily — 1 spray</span></div>
+        <div class="exercise-row"><span>Solu-CORTEF 100mg</span><span class="sets amber">Emergency kit (PRN)</span></div>
+      </div>
+    </div>
+    <div class="callout red" style="margin-top:12px;">
+      <strong>⚠️ Sick-Day Rule</strong>
+      If you are unwell, vomiting, or under significant physical stress today: double your hydrocortisone dose immediately and contact your endocrinologist. Do not wait.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Footer ═══ -->
+<div style="text-align:center;padding:20px 0 0;font-size:.72rem;color:var(--muted);">
+  Daily Health Coaching Briefing · Raghav Chadha · June 25, 2026 · Data: WHOOP MCP + Lose It! Gmail + HealthEx
+  · <a href="https://app.notion.com/p/38a78bca7de1813e8dece47cd8e098a1" target="_blank" style="color:var(--blue);text-decoration:none;">Open in Notion →</a>
+</div>
+
+</div><!-- /wrap -->
+</body>
+</html>
