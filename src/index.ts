@@ -452,6 +452,18 @@ async function main(): Promise<void> {
 					const session = transports.get(sessionId)!;
 					session.lastAccess = Date.now();
 					transport = session.transport;
+				} else if (sessionId) {
+					// Client is presenting a session ID we don't recognize (e.g. our
+					// in-memory transports map was wiped by a restart/redeploy).
+					// Reply with a proper JSON-RPC error and 404 so the client knows
+					// to reinitialize, instead of silently handing a non-initialize
+					// request to a fresh, un-initialized transport.
+					res.status(404).json({
+						jsonrpc: '2.0',
+						error: { code: -32001, message: 'Session not found or expired. Reinitialize.' },
+						id: null,
+					});
+					return;
 				} else {
 					transport = new StreamableHTTPServerTransport({
 						sessionIdGenerator: () => crypto.randomUUID(),
